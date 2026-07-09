@@ -8,3 +8,9 @@ Logs/
 npm-debug.log
 yarn-error.log
 .env
+
+# AI & Memory
+MEMORY_BROSKY_GYM.md
+_GEMINI.md
+.tasks/gemini-import/
+.tasks/
