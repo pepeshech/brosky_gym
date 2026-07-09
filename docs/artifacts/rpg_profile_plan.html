@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brosky Gym - План Редизайна RPG</title>
+  
+  <script>
+    // Theme toggle logic
+    const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (theme === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+    :root {
+      /* Light Theme Colors */
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      
+      --accent-prm: #3b82f6;
+      --accent-sec: #8b5cf6;
+      
+      --b-rad: 16px;
+      --t-speed: 0.3s;
+    }
+
+    html.dark {
+      /* Dark Theme Colors */
+      --bg-main: #020617;
+      --bg-card: #0f172a;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+
+      --accent-prm: #60a5fa;
+      --accent-sec: #a78bfa;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      transition: background-color var(--t-speed), color var(--t-speed);
+      line-height: 1.6;
+    }
+
+    h1, h2, h3 { font-family: 'Outfit', sans-serif; }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 60px;
+    }
+    
+    .title-area h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-prm), var(--accent-sec));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .title-area p { color: var(--text-muted); font-size: 1.1rem; }
+
+    .theme-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all var(--t-speed);
+    }
+    .theme-btn:hover { background: var(--border); }
+
+    /* Bento Grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--b-rad);
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: transform var(--t-speed), box-shadow var(--t-speed);
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 4px;
+      background: linear-gradient(90deg, var(--accent-prm), var(--accent-sec));
+      opacity: 0;
+      transition: opacity var(--t-speed);
+    }
+    .card:hover::before { opacity: 1; }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Span 2 columns */
+    .span-2 { grid-column: span 2; }
+    
+    @media (max-width: 768px) {
+      .bento-grid { grid-template-columns: 1fr; }
+      .span-2 { grid-column: span 1; }
+    }
+
+    /* Radar Chart Mockup */
+    .radar-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 0;
+    }
+    .radar {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      border: 1px dashed var(--border);
+      position: relative;
+    }
+    .radar polygon {
+      fill: var(--accent-prm);
+      fill-opacity: 0.2;
+      stroke: var(--accent-prm);
+      stroke-width: 2;
+    }
+    .radar-label {
+      position: absolute;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Timeline */
+    .timeline {
+      border-left: 2px solid var(--border);
+      padding-left: 24px;
+      margin-top: 20px;
+    }
+    .tl-item {
+      position: relative;
+      margin-bottom: 32px;
+    }
+    .tl-item:last-child { margin-bottom: 0; }
+    
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -33px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--bg-main);
+      border: 3px solid var(--accent-prm);
+    }
+    
+    .tl-date {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      color: var(--accent-sec);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .tl-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    /* Features List */
+    .feature-list { list-style: none; margin-top: 16px; }
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+    .icon-box {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--bg-main);
+      display: flex; justify-content: center; align-items: center;
+      color: var(--accent-prm);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="title-area">
+        <h1>Редизайн Профиля (RPG) и Онбординг</h1>
+        <p>План реализации для Brosky Gym</p>
+      </div>
+      <button class="theme-btn" onclick="toggleTheme()">Сменить Тему</button>
+    </header>
+
+    <div class="bento-grid">
+      
+      <!-- Intro Card -->
+      <div class="card span-2">
+        <h2 class="card-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+          Обзор Концепта
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Для повышения удержания пользователей (Retention) и ежедневной активности, мы перерабатываем процессы настройки и профиля. В систему внедряются <strong>RPG-механики</strong>: повышение уровня на основе тренировочного объема, система "классов" исходя из целей (Пауэрлифтер, Бодибилдер, Атлет), и динамическая Spider-диаграмма для отображения характеристик.
+        </p>
+      </div>
+
+      <!-- Stats Card -->
+      <div class="card">
+        <h2 class="card-title">Характеристики</h2>
+        <div class="radar-wrapper">
+          <svg class="radar" viewBox="-110 -110 220 220">
+            <!-- Background Web -->
+            <polygon points="0,-100 86,-50 86,50 0,100 -86,50 -86,-50" fill="none" stroke="var(--border)" stroke-width="1"></polygon>
+            <polygon points="0,-75 65,-37.5 65,37.5 0,75 -65,37.5 -65,-37.5" fill="none" stroke="var(--border)" stroke-width="1"></polygon>
+            <polygon points="0,-50 43,-25 43,25 0,50 -43,25 -43,-25" fill="none" stroke="var(--border)" stroke-width="1"></polygon>
+            
+            <!-- Axes -->
+            <line x1="0" y1="0" x2="0" y2="-100" stroke="var(--border)"></line>
+            <line x1="0" y1="0" x2="86" y2="-50" stroke="var(--border)"></line>
+            <line x1="0" y1="0" x2="86" y2="50" stroke="var(--border)"></line>
+            <line x1="0" y1="0" x2="0" y2="100" stroke="var(--border)"></line>
+            <line x1="0" y1="0" x2="-86" y2="50" stroke="var(--border)"></line>
+            <line x1="0" y1="0" x2="-86" y2="-50" stroke="var(--border)"></line>
+
+            <!-- Data Polygon -->
+            <polygon points="0,-80 70,-40 50,20 0,90 -60,40 -40,-20">
+              <animate attributeName="points" dur="3s" repeatCount="indefinite"
+                values="0,-80 70,-40 50,20 0,90 -60,40 -40,-20;
+                        0,-90 60,-50 60,30 0,80 -70,30 -50,-30;
+                        0,-80 70,-40 50,20 0,90 -60,40 -40,-20" />
+            </polygon>
+          </svg>
+          <div class="radar-label" style="top: -5px; left: 50%; transform: translateX(-50%);">СИЛА</div>
+          <div class="radar-label" style="top: 45px; right: 5px;">ВЫН</div>
+          <div class="radar-label" style="bottom: 45px; right: 5px;">ЛОВК</div>
+          <div class="radar-label" style="bottom: -5px; left: 50%; transform: translateX(-50%);">ВИТ</div>
+          <div class="radar-label" style="bottom: 45px; left: 5px;">ИНТ</div>
+          <div class="radar-label" style="top: 45px; left: 5px;">ВОЛЯ</div>
+        </div>
+      </div>
+
+      <!-- Feature Breakdown -->
+      <div class="card span-2">
+        <h2 class="card-title">Ключевые Компоненты</h2>
+        <ul class="feature-list">
+          <li>
+            <div class="icon-box">🛡️</div>
+            <div>
+              <strong>Геймифицированный Онбординг (Путь Героя)</strong><br>
+              Пошаговая настройка из 3 этапов: "Выбери свой путь" (Цель тренировок), "Калибровка оболочки" (Ввод замеров и расчет BMR), и "Создание пакта" (Установка целей на неделю).
+            </div>
+          </li>
+          <li>
+            <div class="icon-box">📈</div>
+            <div>
+              <strong>Система Опыта (XP)</strong><br>
+              Пользователи получают опыт (XP) на основе суммарного тоннажа и регулярности (Стрики). Набор опыта заполняет шкалу прогресса, открывая новые визуальные рамки для аватара.
+            </div>
+          </li>
+          <li>
+            <div class="icon-box">🏅</div>
+            <div>
+              <strong>Сетка Достижений (Ачивки)</strong><br>
+              Система коллекционных значков за достижение важных вех (например, "Тоннаж 1000 кг", "Стрик 10 дней", "Первая рекомпозиция").
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Timeline -->
+      <div class="card">
+        <h2 class="card-title">Таймлайн Спринта</h2>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-date">Фаза 1 (Дни 1-2)</div>
+            <div class="tl-title">Обновление Стейта</div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Расширение хранилища <code>gymStore</code> (Zustand) объектами XP, Уровня и Характеристик.</p>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date">Фаза 2 (Дни 3-4)</div>
+            <div class="tl-title">Экраны Онбординга</div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Реализация многошагового процесса настройки в стиле "Путь Героя".</p>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date">Фаза 3 (Дни 5-7)</div>
+            <div class="tl-title">Сборка UI Профиля</div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Интеграция Spider-графика (Recharts), шкалы XP и Bento-макета в <code>ProfileTab.tsx</code>.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

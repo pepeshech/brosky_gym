@@ -1,0 +1,3 @@
+@echo off
+echo Starting Ngrok for Brosky Gym (Vite Dev Server)...
+ngrok http 5173

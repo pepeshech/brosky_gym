@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BROSKY GYM — Редизайн вкладки «Профиль»</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    (function () {
+      const saved = localStorage.getItem('brosky-profile-redesign-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (saved === 'dark' || (!saved && prefersDark)) document.documentElement.classList.add('dark');
+    })();
+  </script>
+  <style>
+    :root {
+      --accent: #466bf7;
+      --accent-600: #2555df;
+      --accent-glow: rgba(70, 107, 247, 0.18);
+      --bg: #f4f6fa;
+      --surface: rgba(255, 255, 255, 0.45);
+      --card: rgba(255, 255, 255, 0.65);
+      --border: rgba(0, 0, 0, 0.06);
+      --text: #1f2937;
+      --text-muted: #64748b;
+      --text-faint: #94a3b8;
+      --recomp: #a855f7;
+      --maintenance: #466bf7;
+      --bulk: #10b981;
+      --cut: #f43f5e;
+      --protein: #f97316;
+      --fat: #eab308;
+      --carbs: #06b6d4;
+      --shadow: 0 8px 32px rgba(31, 38, 135, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.5);
+    }
+    html.dark {
+      --bg: #0f1419;
+      --surface: rgba(22, 28, 38, 0.72);
+      --card: rgba(30, 38, 52, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-faint: #64748b;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --accent-glow: rgba(70, 107, 247, 0.28);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Plus Jakarta Sans", -apple-system, sans-serif;
+      background: var(--bg);
+      background-image:
+        radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.5) 0, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(243, 232, 255, 0.5) 0, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(219, 234, 254, 0.4) 0, transparent 50%);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    html.dark body {
+      background-image:
+        radial-gradient(at 0% 0%, rgba(70, 107, 247, 0.12) 0, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.08) 0, transparent 50%);
+    }
+    h1, h2, h3, .display { font-family: Outfit, sans-serif; letter-spacing: -0.015em; }
+
+    .page-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+    }
+    html.dark .page-header { background: rgba(15, 20, 25, 0.9); }
+
+    .header-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .brand { font-family: Outfit; font-weight: 900; font-size: 1.1rem; }
+    .brand span { color: var(--accent); }
+
+    .concept-tabs {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 5px; border-radius: 16px;
+    }
+    .concept-tab {
+      border: none; background: transparent; color: var(--text-muted);
+      font-family: inherit; font-size: 0.72rem; font-weight: 700;
+      padding: 8px 14px; border-radius: 12px; cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .concept-tab:hover { color: var(--text); background: rgba(255,255,255,0.5); }
+    .concept-tab.active {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+    .theme-btn {
+      border: 1px solid var(--border); background: var(--surface);
+      border-radius: 12px; padding: 8px 12px; cursor: pointer;
+      font-size: 0.75rem; font-weight: 700; color: var(--text-muted);
+    }
+
+    .intro {
+      max-width: 1280px; margin: 24px auto 0; padding: 0 20px;
+    }
+    .intro h2 { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; }
+    .intro p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.55; max-width: 720px; }
+    .concept-desc {
+      margin-top: 12px; padding: 12px 16px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; font-size: 0.8rem; color: var(--text-muted);
+      border-left: 3px solid var(--accent);
+    }
+
+    .showcase {
+      max-width: 1280px; margin: 20px auto 60px; padding: 0 20px;
+    }
+    .concept-panel { display: none; animation: fadeUp 0.35s ease; }
+    .concept-panel.active { display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Shared glass */
+    .glass {
+      background: var(--surface);
+      backdrop-filter: blur(20px) saturate(190%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow);
+      border-radius: 20px;
+    }
+    .glass-sm {
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+    }
+    .section-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.95rem; font-weight: 800; color: var(--accent);
+      padding-bottom: 12px; margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .badge {
+      font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.05em; padding: 4px 10px; border-radius: 999px;
+    }
+    .badge-train { background: rgba(16,185,129,0.12); color: #059669; border: 1px solid rgba(16,185,129,0.25); }
+    .badge-rest { background: rgba(70,107,247,0.1); color: var(--accent); border: 1px solid rgba(70,107,247,0.2); }
+    html.dark .badge-train { color: #34d399; }
+    .btn-primary {
+      width: 100%; border: none; background: var(--accent); color: #fff;
+      font-family: inherit; font-weight: 800; font-size: 0.82rem;
+      padding: 12px; border-radius: 14px; cursor: pointer;
+      box-shadow: 0 6px 20px var(--accent-glow);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .goal-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .macro-p { color: var(--protein); }
+    .macro-f { color: var(--fat); }
+    .macro-c { color: var(--carbs); }
+
+    /* Ring chart */
+    .ring-wrap { position: relative; width: 120px; height: 120px; }
+    .ring-wrap svg { transform: rotate(-90deg); }
+    .ring-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .ring-val { font-family: Outfit; font-weight: 900; font-size: 1.25rem; line-height: 1; }
+    .ring-lbl { font-size: 0.55rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+
+    /* Calendar */
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+    .cal-head { font-size: 0.62rem; font-weight: 800; color: var(--text-faint); padding: 4px 0; }
+    .cal-day {
+      aspect-ratio: 1; min-height: 32px; border-radius: 10px;
+      font-size: 0.72rem; font-weight: 700; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      background: var(--card); color: var(--text);
+    }
+    .cal-day.workout { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .cal-day.today { box-shadow: 0 0 0 2px #10b981; }
+
+    /* ═══ CONCEPT 1: Dashboard Hero ═══ */
+    .c1-hero {
+      display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center;
+      padding: 24px; margin-bottom: 16px;
+      background: linear-gradient(135deg, rgba(70,107,247,0.08) 0%, rgba(168,85,247,0.05) 100%);
+    }
+    .c1-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px; }
+    .c1-stat .lbl { font-size: 0.6rem; font-weight: 800; color: var(--text-faint); text-transform: uppercase; }
+    .c1-stat .val { font-family: Outfit; font-size: 1.5rem; font-weight: 900; }
+    .c1-stat .unit { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
+    .c1-goals-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .c1-goal-pill {
+      padding: 10px 16px; border-radius: 999px; border: 2px solid var(--border);
+      background: var(--card); font-size: 0.72rem; font-weight: 800; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+    }
+    .c1-goal-pill.active { border-color: var(--maintenance); background: rgba(70,107,247,0.08); color: var(--maintenance); }
+    .c1-bento {
+      display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px;
+    }
+    .c1-today { grid-column: span 5; padding: 20px; }
+    .c1-kbju { grid-column: span 7; padding: 20px; }
+    .c1-cal { grid-column: span 7; padding: 20px; }
+    .c1-side { grid-column: span 5; padding: 20px; }
+    @media (max-width: 900px) {
+      .c1-bento > * { grid-column: span 12 !important; }
+      .c1-hero { grid-template-columns: 1fr; }
+    }
+
+    /* ═══ CONCEPT 2: Vertical Flow ═══ */
+    .c2-stack { display: flex; flex-direction: column; gap: 14px; max-width: 520px; margin: 0 auto; }
+    .c2-card { padding: 18px; }
+    .c2-profile-row {
+      display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .c2-profile-row::-webkit-scrollbar { display: none; }
+    .c2-mini {
+      flex: 0 0 auto; min-width: 72px; text-align: center; padding: 12px 10px;
+    }
+    .c2-goals-seg {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+    }
+    .c2-goals-seg button {
+      border: 1px solid var(--border); background: var(--card);
+      border-radius: 12px; padding: 10px 4px; font-size: 0.62rem; font-weight: 800;
+      cursor: pointer; color: var(--text-muted); transition: all 0.2s;
+    }
+    .c2-goals-seg button.active {
+      background: rgba(70,107,247,0.1); border-color: var(--accent); color: var(--accent);
+    }
+    .c2-today-big {
+      text-align: center; padding: 20px 0 12px;
+    }
+    .c2-today-big .kcal { font-family: Outfit; font-size: 2.8rem; font-weight: 900; line-height: 1; }
+    .c2-macros-inline { display: flex; justify-content: center; gap: 16px; margin-top: 12px; }
+    .c2-macro-item { text-align: center; }
+    .c2-macro-item .n { font-size: 0.95rem; font-weight: 800; }
+    .c2-macro-item .l { font-size: 0.6rem; color: var(--text-faint); font-weight: 700; text-transform: uppercase; }
+    .c2-accordion {
+      border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    }
+    .c2-accordion summary {
+      padding: 12px 14px; font-size: 0.75rem; font-weight: 700;
+      cursor: pointer; list-style: none; display: flex; justify-content: space-between;
+      background: rgba(0,0,0,0.02);
+    }
+    html.dark .c2-accordion summary { background: rgba(255,255,255,0.03); }
+    .c2-accordion .body { padding: 12px 14px; font-size: 0.72rem; color: var(--text-muted); }
+
+    /* ═══ CONCEPT 3: Bento Widgets ═══ */
+    .c3-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: auto;
+      gap: 12px;
+    }
+    .c3-w { padding: 16px; }
+    .c3-profile { grid-column: span 2; grid-row: span 2; }
+    .c3-today { grid-column: span 2; }
+    .c3-ring { grid-column: span 2; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .c3-train { grid-column: span 3; }
+    .c3-rest { grid-column: span 3; }
+    .c3-goals { grid-column: span 4; }
+    .c3-cal { grid-column: span 2; grid-row: span 2; }
+    .c3-tdee { grid-column: span 6; }
+    .c3-param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .c3-param { padding: 10px; text-align: center; }
+    .c3-param .l { font-size: 0.58rem; font-weight: 800; color: var(--text-faint); text-transform: uppercase; }
+    .c3-param .v { font-family: Outfit; font-size: 1.1rem; font-weight: 900; margin-top: 2px; }
+    .c3-goals-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+    .c3-goal-card {
+      padding: 10px; border-radius: 12px; border: 2px solid var(--border);
+      font-size: 0.65rem; font-weight: 800; text-align: center; cursor: pointer;
+    }
+    .c3-goal-card.active { border-color: var(--maintenance); background: rgba(70,107,247,0.06); color: var(--maintenance); }
+    @media (max-width: 900px) {
+      .c3-grid { grid-template-columns: 1fr 1fr; }
+      .c3-profile, .c3-today, .c3-ring, .c3-train, .c3-rest, .c3-goals, .c3-cal, .c3-tdee { grid-column: span 2; grid-row: auto; }
+      .c3-goals-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ═══ CONCEPT 4: Split Pro ═══ */
+    .c4-layout { display: grid; grid-template-columns: 280px 1fr; gap: 16px; align-items: start; }
+    @media (max-width: 900px) { .c4-layout { grid-template-columns: 1fr; } }
+    .c4-sidebar { padding: 20px; position: sticky; top: 80px; }
+    .c4-avatar {
+      width: 64px; height: 64px; border-radius: 20px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      display: flex; align-items: center; justify-content: center;
+      font-family: Outfit; font-size: 1.5rem; font-weight: 900; color: #fff;
+      margin-bottom: 14px;
+    }
+    .c4-name { font-family: Outfit; font-weight: 900; font-size: 1.1rem; }
+    .c4-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+    .c4-params { margin: 18px 0; display: flex; flex-direction: column; gap: 8px; }
+    .c4-param-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 10px; border-radius: 10px; background: rgba(0,0,0,0.02);
+      font-size: 0.75rem;
+    }
+    html.dark .c4-param-row { background: rgba(255,255,255,0.04); }
+    .c4-param-row .k { color: var(--text-muted); font-weight: 600; }
+    .c4-param-row .v { font-weight: 800; }
+    .c4-goal-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .c4-goal-item {
+      padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border);
+      font-size: 0.72rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .c4-goal-item.active { border-color: var(--maintenance); background: rgba(70,107,247,0.08); }
+    .c4-main { display: flex; flex-direction: column; gap: 14px; }
+    .c4-hero-card {
+      padding: 24px; display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center;
+    }
+    .c4-rings-row { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+    .c4-dual { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 700px) { .c4-dual { grid-template-columns: 1fr; } .c4-hero-card { grid-template-columns: 1fr; } }
+    .c4-day-card { padding: 16px; }
+    .c4-day-card .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .c4-day-card .head span:first-child { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
+    .c4-day-card .head span:last-child { font-family: Outfit; font-weight: 900; font-size: 1rem; }
+    .c4-macro-bar { display: flex; height: 6px; border-radius: 999px; overflow: hidden; margin: 10px 0; background: rgba(0,0,0,0.06); }
+    .c4-macro-bar span:nth-child(1) { background: var(--protein); }
+    .c4-macro-bar span:nth-child(2) { background: var(--fat); }
+    .c4-macro-bar span:nth-child(3) { background: var(--carbs); flex: 1; }
+    .c4-macro-legend { display: flex; gap: 12px; font-size: 0.65rem; color: var(--text-muted); }
+
+    .phone-frame {
+      border: 3px solid #1f2937; border-radius: 32px; padding: 12px 8px;
+      max-width: 390px; margin: 30px auto 0; background: #111;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .phone-screen {
+      border-radius: 24px; overflow: hidden; background: var(--bg);
+      max-height: 680px; overflow-y: auto;
+    }
+    .phone-notch {
+      height: 24px; background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.55rem; font-weight: 800; color: var(--text-faint);
+    }
+    .mobile-label {
+      text-align: center; font-size: 0.7rem; font-weight: 700;
+      color: var(--text-muted); margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-inner">
+      <div class="brand">BROSKY <span>GYM</span> · Профиль</div>
+      <div class="concept-tabs" role="tablist">
+        <button class="concept-tab active" data-concept="1" role="tab">1 · Dashboard Hero</button>
+        <button class="concept-tab" data-concept="2" role="tab">2 · Vertical Flow</button>
+        <button class="concept-tab" data-concept="3" role="tab">3 · Bento Widgets</button>
+        <button class="concept-tab" data-concept="4" role="tab">4 · Split Pro</button>
+      </div>
+      <button class="theme-btn" id="themeToggle" aria-label="Тема">🌓 Тема</button>
+    </div>
+  </header>
+
+  <div class="intro">
+    <h2>4 концепции редизайна вкладки «Профиль»</h2>
+    <p>Все варианты сохраняют Liquid Glass, Persian Blue (#466bf7), шрифты Outfit + Plus Jakarta Sans и цветовую систему целей. Контент и функции остаются теми же — меняется только компоновка и визуальная иерархия.</p>
+    <div class="concept-desc" id="conceptDesc">
+      <strong>Концепция 1 — Dashboard Hero:</strong> верхний hero-блок с ключевыми метриками и кольцом КБЖУ, горизонтальные pill-переключатели целей, bento-сетка для планов и календаря. Акцент на «сегодня» — первое, что видит пользователь.
+    </div>
+  </div>
+
+  <div class="showcase">
+
+    <!-- ═══ CONCEPT 1 ═══ -->
+    <div class="concept-panel active" id="concept-1">
+      <div class="glass c1-hero">
+        <div>
+          <div class="badge badge-rest" style="display:inline-block;margin-bottom:8px">Поддержание · 9 000 шагов</div>
+          <h3 class="display" style="font-size:1.4rem;font-weight:900">Профиль атлета</h3>
+          <div class="c1-stats">
+            <div class="c1-stat"><div class="lbl">Вес</div><div class="val">82 <span class="unit">кг</span></div></div>
+            <div class="c1-stat"><div class="lbl">Жир</div><div class="val">18 <span class="unit">%</span></div></div>
+            <div class="c1-stat"><div class="lbl">Рост</div><div class="val">180 <span class="unit">см</span></div></div>
+            <div class="c1-stat"><div class="lbl">Возраст</div><div class="val">28 <span class="unit">лет</span></div></div>
+          </div>
+        </div>
+        <div class="ring-wrap">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="10"/>
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#466bf7" stroke-width="10"
+              stroke-dasharray="327" stroke-dashoffset="80" stroke-linecap="round"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-val">2 450</div>
+            <div class="ring-lbl">ккал сегодня</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="c1-goals-row">
+        <button class="c1-goal-pill"><span class="goal-dot" style="background:var(--recomp)"></span>Рекомпозиция</button>
+        <button class="c1-goal-pill active"><span class="goal-dot" style="background:var(--maintenance)"></span>Поддержание</button>
+        <button class="c1-goal-pill"><span class="goal-dot" style="background:var(--bulk)"></span>Набор</button>
+        <button class="c1-goal-pill"><span class="goal-dot" style="background:var(--cut)"></span>Сушка</button>
+        <button class="btn-primary" style="width:auto;padding:10px 20px;margin-left:auto">📄 Отчёт</button>
+      </div>
+
+      <div class="c1-bento">
+        <div class="glass c1-today">
+          <div class="section-title">⚡ Сегодня</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <span class="badge badge-train">День тренировки</span>
+            <span style="font-size:0.72rem;color:var(--text-muted)">💧 3 200 мл · 👣 9 000</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            <div class="glass-sm" style="padding:10px;text-align:center"><div class="l" style="font-size:0.58rem;color:var(--text-faint);font-weight:800">Б</div><div class="macro-p" style="font-weight:900">185г</div></div>
+            <div class="glass-sm" style="padding:10px;text-align:center"><div class="l" style="font-size:0.58rem;color:var(--text-faint);font-weight:800">Ж</div><div class="macro-f" style="font-weight:900">72г</div></div>
+            <div class="glass-sm" style="padding:10px;text-align:center"><div class="l" style="font-size:0.58rem;color:var(--text-faint);font-weight:800">У</div><div class="macro-c" style="font-weight:900">280г</div></div>
+          </div>
+        </div>
+        <div class="glass c1-kbju">
+          <div class="section-title">🔥 Общий КБЖУ</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="glass-sm" style="padding:14px">
+              <div style="font-size:0.65rem;font-weight:800;color:#059669;margin-bottom:8px">● ТРЕНИРОВКА</div>
+              <div style="font-family:Outfit;font-weight:900;font-size:1.1rem">2 650 ккал</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:6px">Б 190 · Ж 75 · У 310</div>
+            </div>
+            <div class="glass-sm" style="padding:14px">
+              <div style="font-size:0.65rem;font-weight:800;color:var(--accent);margin-bottom:8px">● ОТДЫХ</div>
+              <div style="font-family:Outfit;font-weight:900;font-size:1.1rem">2 350 ккал</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:6px">Б 185 · Ж 72 · У 250</div>
+            </div>
+          </div>
+        </div>
+        <div class="glass c1-cal">
+          <div class="section-title">🏋️ Календарь · Июнь 2026 · <span style="font-size:0.72rem;background:rgba(70,107,247,0.1);padding:2px 8px;border-radius:8px;margin-left:6px">3/нед</span></div>
+          <div class="cal-grid">
+            <div class="cal-head">Пн</div><div class="cal-head">Вт</div><div class="cal-head">Ср</div><div class="cal-head">Чт</div><div class="cal-head">Пт</div><div class="cal-head">Сб</div><div class="cal-head">Вс</div>
+            <div class="cal-day"></div><div class="cal-day workout">2</div><div class="cal-day">3</div><div class="cal-day workout">4</div><div class="cal-day">5</div><div class="cal-day">6</div><div class="cal-day workout">7</div>
+            <div class="cal-day">8</div><div class="cal-day">9</div><div class="cal-day workout">10</div><div class="cal-day">11</div><div class="cal-day">12</div><div class="cal-day today">13</div><div class="cal-day">14</div>
+          </div>
+        </div>
+        <div class="glass c1-side">
+          <div class="section-title">📊 TDEE</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:0.75rem">
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">BMR</span><strong>1 820 ккал</strong></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">NEAT</span><strong style="color:#059669">+420</strong></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">TDEE отдых</span><strong>2 380</strong></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--accent)">TDEE трен.</span><strong style="color:var(--accent)">2 680</strong></div>
+          </div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:0.62rem;font-weight:800;color:var(--text-faint);margin-bottom:8px">СТАРТОВЫЕ ОБМЕРЫ</div>
+            <div style="font-size:0.72rem;display:flex;flex-direction:column;gap:4px;color:var(--text-muted)">
+              <div style="display:flex;justify-content:space-between"><span>Грудь</span><strong>102 см</strong></div>
+              <div style="display:flex;justify-content:space-between"><span>Талия</span><strong>84 см</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CONCEPT 2 ═══ -->
+    <div class="concept-panel" id="concept-2">
+      <div style="display:grid;grid-template-columns:1fr 390px;gap:32px;align-items:start">
+        <div>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;line-height:1.5">Mobile-first вертикальный поток: одна колонка, swipe-карточки параметров, сегментированный выбор цели, крупный блок «Сегодня». Идеален для телефона — минимум скролла до главного.</p>
+        </div>
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="phone-notch">BROSKY GYM</div>
+            <div class="c2-stack" style="padding:12px">
+              <div class="glass c2-card">
+                <div style="font-size:0.65rem;font-weight:800;color:var(--accent);text-transform:uppercase;margin-bottom:10px">🛡 Параметры</div>
+                <div class="c2-profile-row">
+                  <div class="glass-sm c2-mini"><div style="font-size:0.55rem;color:var(--text-faint);font-weight:800">ВЕС</div><div style="font-family:Outfit;font-weight:900;font-size:1.1rem">82</div></div>
+                  <div class="glass-sm c2-mini"><div style="font-size:0.55rem;color:var(--text-faint);font-weight:800">ЖИР</div><div style="font-family:Outfit;font-weight:900;font-size:1.1rem">18%</div></div>
+                  <div class="glass-sm c2-mini"><div style="font-size:0.55rem;color:var(--text-faint);font-weight:800">РОСТ</div><div style="font-family:Outfit;font-weight:900;font-size:1.1rem">180</div></div>
+                  <div class="glass-sm c2-mini"><div style="font-size:0.55rem;color:var(--text-faint);font-weight:800">ВОЗР.</div><div style="font-family:Outfit;font-weight:900;font-size:1.1rem">28</div></div>
+                </div>
+              </div>
+              <div class="glass c2-card">
+                <div style="font-size:0.65rem;font-weight:800;color:var(--text-faint);margin-bottom:8px">ЦЕЛЬ ПИТАНИЯ</div>
+                <div class="c2-goals-seg">
+                  <button>Рек.</button><button class="active">Подд.</button><button>Наб.</button><button>Суш.</button>
+                </div>
+              </div>
+              <div class="glass c2-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                  <span style="font-size:0.72rem;font-weight:800">Сегодня</span>
+                  <span class="badge badge-train">Тренировка</span>
+                </div>
+                <div class="c2-today-big">
+                  <div class="kcal">2 450</div>
+                  <div style="font-size:0.65rem;color:var(--text-muted);font-weight:700;margin-top:4px">ккал · 💧 3 200 мл · 👣 9k</div>
+                </div>
+                <div class="c2-macros-inline">
+                  <div class="c2-macro-item"><div class="n macro-p">185г</div><div class="l">Белки</div></div>
+                  <div class="c2-macro-item"><div class="n macro-f">72г</div><div class="l">Жиры</div></div>
+                  <div class="c2-macro-item"><div class="n macro-c">280г</div><div class="l">Углев.</div></div>
+                </div>
+              </div>
+              <div class="glass c2-card" style="padding:14px">
+                <div class="c2-accordion">
+                  <details>
+                    <summary>КБЖУ · Трен / Отдых ▾</summary>
+                    <div class="body">
+                      <div style="margin-bottom:6px"><strong>Трен:</strong> 2 650 ккал (Б190 Ж75 У310)</div>
+                      <div><strong>Отдых:</strong> 2 350 ккал (Б185 Ж72 У250)</div>
+                    </div>
+                  </details>
+                  <details>
+                    <summary>TDEE и метаболизм ▾</summary>
+                    <div class="body">BMR 1 820 · NEAT +420 · TDEE 2 380/2 680</div>
+                  </details>
+                  <details open>
+                    <summary>Календарь · 3/нед ▾</summary>
+                    <div class="body">
+                      <div class="cal-grid" style="margin-top:8px">
+                        <div class="cal-head">П</div><div class="cal-head">В</div><div class="cal-head">С</div><div class="cal-head">Ч</div><div class="cal-head">П</div><div class="cal-head">С</div><div class="cal-head">В</div>
+                        <div class="cal-day workout" style="min-height:28px;font-size:0.62rem">2</div>
+                        <div class="cal-day" style="min-height:28px;font-size:0.62rem">3</div>
+                        <div class="cal-day workout" style="min-height:28px;font-size:0.62rem">4</div>
+                        <div class="cal-day" style="min-height:28px;font-size:0.62rem">5</div>
+                        <div class="cal-day" style="min-height:28px;font-size:0.62rem">6</div>
+                        <div class="cal-day workout" style="min-height:28px;font-size:0.62rem">7</div>
+                        <div class="cal-day today" style="min-height:28px;font-size:0.62rem">13</div>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </div>
+              <button class="btn-primary">📄 Создать отчёт</button>
+            </div>
+          </div>
+          <div class="mobile-label">Превью мобильной версии</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CONCEPT 3 ═══ -->
+    <div class="concept-panel" id="concept-3">
+      <div class="c3-grid">
+        <div class="glass c3-w c3-profile">
+          <div class="section-title" style="margin-bottom:8px">🛡 Профиль</div>
+          <div class="c3-param-grid">
+            <div class="glass-sm c3-param"><div class="l">Вес</div><div class="v">82<span style="font-size:0.6rem;color:var(--text-muted)"> кг</span></div></div>
+            <div class="glass-sm c3-param"><div class="l">Жир</div><div class="v">18<span style="font-size:0.6rem;color:var(--text-muted)">%</span></div></div>
+            <div class="glass-sm c3-param"><div class="l">Рост</div><div class="v">180</div></div>
+            <div class="glass-sm c3-param"><div class="l">Возраст</div><div class="v">28</div></div>
+          </div>
+          <button class="btn-primary" style="margin-top:14px;font-size:0.72rem;padding:10px">📄 Отчёт</button>
+        </div>
+        <div class="glass c3-w c3-today">
+          <div style="font-size:0.65rem;font-weight:800;color:var(--text-faint);margin-bottom:4px">СЕГОДНЯ</div>
+          <div style="font-family:Outfit;font-size:1.8rem;font-weight:900">2 450</div>
+          <div style="font-size:0.65rem;color:var(--text-muted)">ккал · тренировка</div>
+          <div style="display:flex;gap:8px;margin-top:10px;font-size:0.68rem;font-weight:800">
+            <span class="macro-p">Б185</span><span class="macro-f">Ж72</span><span class="macro-c">У280</span>
+          </div>
+        </div>
+        <div class="glass c3-w c3-ring">
+          <div class="ring-wrap" style="width:90px;height:90px">
+            <svg width="90" height="90" viewBox="0 0 90 90">
+              <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="8"/>
+              <circle cx="45" cy="45" r="38" fill="none" stroke="#f97316" stroke-width="8" stroke-dasharray="239" stroke-dashoffset="160"/>
+              <circle cx="45" cy="45" r="38" fill="none" stroke="#eab308" stroke-width="8" stroke-dasharray="239" stroke-dashoffset="200" style="opacity:0.7"/>
+              <circle cx="45" cy="45" r="38" fill="none" stroke="#06b6d4" stroke-width="8" stroke-dasharray="239" stroke-dashoffset="100"/>
+            </svg>
+            <div class="ring-center"><div class="ring-val" style="font-size:0.85rem">БЖУ</div></div>
+          </div>
+          <div style="font-size:0.62rem;color:var(--text-muted);margin-top:8px;font-weight:700">Макро-кольцо</div>
+        </div>
+        <div class="glass c3-w c3-train c3-day-card">
+          <div class="head"><span style="color:#059669">● Тренировка</span><span>2 650 ккал</span></div>
+          <div class="c4-macro-bar"><span style="flex:190"></span><span style="flex:75"></span><span style="flex:310"></span></div>
+          <div class="c4-macro-legend"><span class="macro-p">Б 190г</span><span class="macro-f">Ж 75г</span><span class="macro-c">У 310г</span></div>
+        </div>
+        <div class="glass c3-w c3-rest c3-day-card">
+          <div class="head"><span style="color:var(--accent)">● Отдых</span><span>2 350 ккал</span></div>
+          <div class="c4-macro-bar"><span style="flex:185"></span><span style="flex:72"></span><span style="flex:250"></span></div>
+          <div class="c4-macro-legend"><span class="macro-p">Б 185г</span><span class="macro-f">Ж 72г</span><span class="macro-c">У 250г</span></div>
+        </div>
+        <div class="glass c3-w c3-goals">
+          <div style="font-size:0.72rem;font-weight:800;color:var(--text-muted)">✨ Цель питания</div>
+          <div class="c3-goals-grid">
+            <div class="c3-goal-card"><span class="goal-dot" style="background:var(--recomp);display:inline-block;margin-bottom:4px"></span><br>Рекомп.</div>
+            <div class="c3-goal-card active"><span class="goal-dot" style="background:var(--maintenance);display:inline-block;margin-bottom:4px"></span><br>Поддерж.</div>
+            <div class="c3-goal-card"><span class="goal-dot" style="background:var(--bulk);display:inline-block;margin-bottom:4px"></span><br>Набор</div>
+            <div class="c3-goal-card"><span class="goal-dot" style="background:var(--cut);display:inline-block;margin-bottom:4px"></span><br>Сушка</div>
+          </div>
+        </div>
+        <div class="glass c3-w c3-cal">
+          <div style="font-size:0.72rem;font-weight:800;margin-bottom:10px">🏋️ Июнь · 3/нед</div>
+          <div class="cal-grid">
+            <div class="cal-head">П</div><div class="cal-head">В</div><div class="cal-head">С</div><div class="cal-head">Ч</div><div class="cal-head">П</div><div class="cal-head">С</div><div class="cal-head">В</div>
+            <div class="cal-day workout" style="min-height:26px;font-size:0.6rem">2</div>
+            <div class="cal-day" style="min-height:26px;font-size:0.6rem">3</div>
+            <div class="cal-day workout" style="min-height:26px;font-size:0.6rem">4</div>
+            <div class="cal-day" style="min-height:26px;font-size:0.6rem">5</div>
+            <div class="cal-day" style="min-height:26px;font-size:0.6rem">6</div>
+            <div class="cal-day workout" style="min-height:26px;font-size:0.6rem">7</div>
+            <div class="cal-day today" style="min-height:26px;font-size:0.6rem">13</div>
+          </div>
+        </div>
+        <div class="glass c3-w c3-tdee">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+            <span style="font-size:0.75rem;font-weight:800">📊 TDEE · BMR 1 820 · NEAT +420 · Отдых 2 380 · Трен. <span style="color:var(--accent)">2 680</span></span>
+            <span style="font-size:0.65rem;color:var(--text-muted)">Обмеры: грудь 102 · талия 84 см</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CONCEPT 4 ═══ -->
+    <div class="concept-panel" id="concept-4">
+      <div class="c4-layout">
+        <aside class="glass c4-sidebar">
+          <div class="c4-avatar">BG</div>
+          <div class="c4-name">Атлет</div>
+          <div class="c4-sub">Поддержание · 28 лет</div>
+          <div class="c4-params">
+            <div class="c4-param-row"><span class="k">Вес</span><span class="v">82 кг</span></div>
+            <div class="c4-param-row"><span class="k">Жир</span><span class="v">18%</span></div>
+            <div class="c4-param-row"><span class="k">Рост</span><span class="v">180 см</span></div>
+            <div class="c4-param-row"><span class="k">ЧМТ</span><span class="v">67.2 кг</span></div>
+          </div>
+          <div style="font-size:0.62rem;font-weight:800;color:var(--text-faint);margin-bottom:6px">ЦЕЛЬ ПИТАНИЯ</div>
+          <div class="c4-goal-list">
+            <div class="c4-goal-item"><span class="goal-dot" style="background:var(--recomp)"></span>Рекомпозиция</div>
+            <div class="c4-goal-item active"><span class="goal-dot" style="background:var(--maintenance)"></span>Поддержание</div>
+            <div class="c4-goal-item"><span class="goal-dot" style="background:var(--bulk)"></span>Набор массы</div>
+            <div class="c4-goal-item"><span class="goal-dot" style="background:var(--cut)"></span>Сушка</div>
+          </div>
+          <button class="btn-primary" style="margin-top:16px">📄 Создать отчёт</button>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:0.68rem;color:var(--text-muted)">
+            <div style="font-weight:800;margin-bottom:6px;color:var(--text-faint);font-size:0.58rem">ОБМЕРЫ</div>
+            Грудь 102 · Талия 84 · Бёдра 98 см
+          </div>
+        </aside>
+        <div class="c4-main">
+          <div class="glass c4-hero-card">
+            <div>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <span style="font-size:1rem;font-weight:900">План на сегодня</span>
+                <span class="badge badge-train">Тренировка</span>
+              </div>
+              <div style="font-family:Outfit;font-size:2.2rem;font-weight:900;line-height:1">2 450 <span style="font-size:0.9rem;color:var(--text-muted);font-weight:600">ккал</span></div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">💧 3 200 мл · 👣 9 000 шагов</div>
+            </div>
+            <div class="c4-rings-row">
+              <div class="ring-wrap">
+                <svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="#f97316" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="90" stroke-linecap="round"/></svg>
+                <div class="ring-center"><div class="ring-val" style="font-size:0.95rem">185</div><div class="ring-lbl">Белки</div></div>
+              </div>
+              <div class="ring-wrap">
+                <svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="#eab308" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="180" stroke-linecap="round"/></svg>
+                <div class="ring-center"><div class="ring-val" style="font-size:0.95rem">72</div><div class="ring-lbl">Жиры</div></div>
+              </div>
+              <div class="ring-wrap">
+                <svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="#06b6d4" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="60" stroke-linecap="round"/></svg>
+                <div class="ring-center"><div class="ring-val" style="font-size:0.95rem">280</div><div class="ring-lbl">Углев.</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="c4-dual">
+            <div class="glass c4-day-card">
+              <div class="head"><span style="color:#059669">● Тренировочный</span><span>2 650 ккал</span></div>
+              <div class="c4-macro-bar"><span style="flex:190"></span><span style="flex:75"></span><span style="flex:310"></span></div>
+              <div class="c4-macro-legend"><span class="macro-p">Б 190г (760)</span><span class="macro-f">Ж 75г (675)</span><span class="macro-c">У 310г</span></div>
+            </div>
+            <div class="glass c4-day-card">
+              <div class="head"><span style="color:var(--accent)">● День отдыха</span><span>2 350 ккал</span></div>
+              <div class="c4-macro-bar"><span style="flex:185"></span><span style="flex:72"></span><span style="flex:250"></span></div>
+              <div class="c4-macro-legend"><span class="macro-p">Б 185г</span><span class="macro-f">Ж 72г</span><span class="macro-c">У 250г</span></div>
+            </div>
+          </div>
+          <div class="glass" style="padding:18px">
+            <div class="section-title">🏋️ Календарь · Июнь 2026 <span style="margin-left:auto;font-size:0.65rem;background:rgba(70,107,247,0.1);padding:3px 10px;border-radius:8px;color:var(--accent)">3 за неделю</span></div>
+            <div class="cal-grid">
+              <div class="cal-head">Пн</div><div class="cal-head">Вт</div><div class="cal-head">Ср</div><div class="cal-head">Чт</div><div class="cal-head">Пт</div><div class="cal-head">Сб</div><div class="cal-head">Вс</div>
+              <div class="cal-day"></div><div class="cal-day workout">2</div><div class="cal-day">3</div><div class="cal-day workout">4</div><div class="cal-day">5</div><div class="cal-day">6</div><div class="cal-day workout">7</div>
+              <div class="cal-day">8</div><div class="cal-day">9</div><div class="cal-day workout">10</div><div class="cal-day">11</div><div class="cal-day">12</div><div class="cal-day today">13</div><div class="cal-day">14</div>
+              <div class="cal-day">15</div><div class="cal-day workout">16</div><div class="cal-day">17</div><div class="cal-day">18</div><div class="cal-day workout">19</div><div class="cal-day">20</div><div class="cal-day">21</div>
+            </div>
+          </div>
+          <div class="glass" style="padding:16px;font-size:0.75rem;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between">
+            <span><strong style="color:var(--text)">TDEE</strong> · BMR 1 820 · NEAT +420 · EAT +280 · TEF ~10%</span>
+            <span>Отдых: <strong>2 380</strong> · Трен: <strong style="color:var(--accent)">2 680</strong> ккал</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.concept-tab');
+    const panels = document.querySelectorAll('.concept-panel');
+    const desc = document.getElementById('conceptDesc');
+    const descriptions = {
+      '1': '<strong>Концепция 1 — Dashboard Hero:</strong> верхний hero-блок с ключевыми метриками и кольцом КБЖУ, горизонтальные pill-переключатели целей, bento-сетка для планов и календаря. Акцент на «сегодня» — первое, что видит пользователь.',
+      '2': '<strong>Концепция 2 — Vertical Flow:</strong> mobile-first одноколоночный поток. Горизонтальный swipe параметров, сегментированный выбор цели (4 кнопки), крупный блок калорий, аккордеоны для КБЖУ/TDEE/календаря. Минимум визуального шума на маленьком экране.',
+      '3': '<strong>Концепция 3 — Bento Widgets:</strong> асимметричная сетка виджетов в стиле iOS. Каждый блок — самостоятельный «виджет». Макро-кольцо, progress-bar для БЖУ, компактный TDEE-стrip внизу. Максимальная плотность информации на десктопе.',
+      '4': '<strong>Концепция 4 — Split Pro:</strong> sticky sidebar с профилем и целями (как Settings в macOS), основная зона — hero «Сегодня» с тремя SVG-кольцами (как NutritionTab), dual cards для трен/отдых, полноценный календарь. Лучший баланс desktop + consistency с вкладкой «Сегодня».'
+    };
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('concept-' + tab.dataset.concept).classList.add('active');
+        desc.innerHTML = descriptions[tab.dataset.concept];
+      });
+    });
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('brosky-profile-redesign-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+  </script>
+</body>
+</html>

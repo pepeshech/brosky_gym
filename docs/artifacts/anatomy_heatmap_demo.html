@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brosky Gym - Научно-обоснованный концепт Heatmap нагрузки</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #080b11;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.06);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --color-primary: #3b82f6;
+      
+      /* Плавный 7-шаговый спектр нагрузки */
+      --color-load-0: #1e293b;       /* 0: Полный покой (Slate-800) */
+      --color-load-low: #60a5fa;     /* 1: Легкий тонус (Sky-400) */
+      --color-load-mev: #3b82f6;     /* 2: Мин. эффективный объем / MEV (Blue-500) */
+      --color-load-mav-min: #8b5cf6; /* 3: Начало оптимального роста / MAV (Violet-500) */
+      --color-load-mav-max: #c084fc; /* 4: Пик адаптации / MAV Max (Purple-400) */
+      --color-load-mrv: #db2777;     /* 5: Предел восстановления / MRV (Pink-600) */
+      --color-load-over: #ef4444;    /* 6: Перегрузка / Травма (Red-500) */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+      padding: 40px 20px;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(139, 92, 246, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(236, 72, 153, 0.07) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 2.6rem;
+      background: linear-gradient(135deg, #3b82f6 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    @media (min-width: 950px) {
+      .dashboard {
+        grid-template-columns: 440px 1fr;
+      }
+    }
+
+    /* ЛЕВАЯ ПАНЕЛЬ - РЕДАКТОР СЛАЙДЕРОВ */
+    .control-panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+      height: fit-content;
+    }
+
+    .panel-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: white;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title span {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .slider-group {
+      margin-bottom: 22px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .slider-label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .slider-value-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slider-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      background: rgba(59, 130, 246, 0.1);
+      padding: 2px 8px;
+      border-radius: 6px;
+      min-width: 32px;
+      text-align: center;
+    }
+
+    .input-range {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      outline: none;
+      margin-bottom: 6px;
+    }
+
+    .input-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+      transition: transform 0.1s ease;
+    }
+
+    .input-range::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Шкалы под слайдерами */
+    .limits-bar {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      padding: 0 2px;
+    }
+
+    .limit-tag {
+      cursor: help;
+      border-bottom: 1px dotted rgba(255, 255, 255, 0.2);
+    }
+
+    /* ПРАВАЯ ПАНЕЛЬ - ВИЗУАЛИЗАЦИЯ */
+    .view-panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    /* Научный Бадж анализа */
+    .science-badge {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    @media (min-width: 600px) {
+      .science-badge {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .analysis-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .analysis-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .analysis-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* SVG Модель */
+    .model-container {
+      width: 100%;
+      max-width: 440px;
+      margin: 20px auto;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      filter: drop-shadow(0px 10px 30px rgba(0, 0, 0, 0.25));
+    }
+
+    polygon {
+      stroke-width: 0.5px;
+      stroke-linejoin: round;
+      cursor: pointer;
+      transition: fill 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), stroke 0.2s ease;
+    }
+
+    polygon:hover {
+      stroke: #ffffff !important;
+      stroke-width: 0.8px;
+    }
+
+    /* ЛЕГЕНДА ГРАДИЕНТА */
+    .heatmap-legend {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 25px;
+      width: 100%;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
+    }
+
+    .legend-desc {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .legend-title {
+      color: white;
+      font-weight: 600;
+    }
+
+    /* КНОПКИ */
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    .btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: white;
+      padding: 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.35);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Научный Heatmap-атлас тренировочной нагрузки</h1>
+      <p class="subtitle">Интерактивный концепт на базе исследований Майка Израэтеля (Renaissance Periodization). Допустимый объем подходов динамически пересчитывается с учетом анатомических особенностей и восстановительного потенциала каждой мышцы.</p>
+    </header>
+
+    <div class="dashboard">
+      
+      <!-- ПАНЕЛЬ РЕДАКТОРА (СЛАЙДЕРЫ) -->
+      <div class="control-panel">
+        <div class="panel-title">
+          <span>Редактор нагрузок</span>
+          <span>Целевой объем в неделю</span>
+        </div>
+        
+        <!-- ГРУДЬ -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Грудь</span>
+            <div class="slider-value-container">
+              <span class="slider-value" id="val-chest" style="color: var(--color-primary);">0</span>
+            </div>
+          </div>
+          <input type="range" class="input-range" id="slide-chest" min="0" max="30" value="0" oninput="updateLoad('Грудь', this.value)">
+          <div class="limits-bar">
+            <span class="limit-tag" title="Minimum Effective Volume - Минимальный эффективный объем">MEV: 8</span>
+            <span class="limit-tag" title="Maximum Adaptive Volume - Зона максимального роста">MAV: 10-18</span>
+            <span class="limit-tag" title="Maximum Recoverable Volume - Предел восстановления">MRV: 22</span>
+          </div>
+        </div>
+
+        <!-- СПИНА -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Спина (Широчайшие)</span>
+            <div class="slider-value-container">
+              <span class="slider-value" id="val-back" style="color: var(--color-primary);">0</span>
+            </div>
+          </div>
+          <input type="range" class="input-range" id="slide-back" min="0" max="30" value="0" oninput="updateLoad('Широчайшие', this.value)">
+          <div class="limits-bar">
+            <span class="limit-tag" title="Minimum Effective Volume - Минимальный эффективный объем">MEV: 10</span>
+            <span class="limit-tag" title="Maximum Adaptive Volume - Зона максимального роста">MAV: 12-20</span>
+            <span class="limit-tag" title="Maximum Recoverable Volume - Предел восстановления">MRV: 24</span>
+          </div>
+        </div>
+
+        <!-- ПЛЕЧИ -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Плечи (Дельты)</span>
+            <div class="slider-value-container">
+              <span class="slider-value" id="val-shoulders" style="color: var(--color-primary);">0</span>
+            </div>
+          </div>
+          <input type="range" class="input-range" id="slide-shoulders" min="0" max="30" value="0" oninput="updateLoad('Плечи', this.value)">
+          <div class="limits-bar">
+            <span class="limit-tag" title="Minimum Effective Volume - Минимальный эффективный объем">MEV: 8</span>
+            <span class="limit-tag" title="Maximum Adaptive Volume - Зона максимального роста">MAV: 10-18</span>
+            <span class="limit-tag" title="Maximum Recoverable Volume - Предел восстановления">MRV: 22</span>
+          </div>
+        </div>
+
+        <!-- РУКИ -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Руки (Бицепс / Трицепс)</span>
+            <div class="slider-value-container">
+              <span class="slider-value" id="val-arms" style="color: var(--color-primary);">0</span>
+            </div>
+          </div>
+          <input type="range" class="input-range" id="slide-arms" min="0" max="30" value="0" oninput="updateLoad('Руки', this.value)">
+          <div class="limits-bar">
+            <span class="limit-tag" title="Микро-мышцы получают косвенную нагрузку, нормы ниже">MEV: 6</span>
+            <span class="limit-tag" title="Maximum Adaptive Volume - Зона максимального роста">MAV: 8-14</span>
+            <span class="limit-tag" title="Maximum Recoverable Volume - Предел восстановления">MRV: 18</span>
+          </div>
+        </div>
+
+        <!-- НОГИ -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Ноги (Квадрицепсы)</span>
+            <div class="slider-value-container">
+              <span class="slider-value" id="val-legs" style="color: var(--color-primary);">0</span>
+            </div>
+          </div>
+          <input type="range" class="input-range" id="slide-legs" min="0" max="30" value="0" oninput="updateLoad('Квадрицепс', this.value)">
+          <div class="limits-bar">
+            <span class="limit-tag" title="Тяжелые системные приседания вызывают утомление ЦНС">MEV: 8</span>
+            <span class="limit-tag" title="Maximum Adaptive Volume - Зона максимального роста">MAV: 10-16</span>
+            <span class="limit-tag" title="Maximum Recoverable Volume - Предел восстановления">MRV: 20</span>
+          </div>
+        </div>
+
+        <!-- ЯГОДИЦЫ -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Ягодицы</span>
+            <div class="slider-value-container">
+              <span class="slider-value" id="val-glutes" style="color: var(--color-primary);">0</span>
+            </div>
+          </div>
+          <input type="range" class="input-range" id="slide-glutes" min="0" max="30" value="0" oninput="updateLoad('Ягодицы', this.value)">
+          <div class="limits-bar">
+            <span class="limit-tag" title="Minimum Effective Volume - Минимальный эффективный объем">MEV: 6</span>
+            <span class="limit-tag" title="Maximum Adaptive Volume - Зона максимального роста">MAV: 8-14</span>
+            <span class="limit-tag" title="Maximum Recoverable Volume - Предел восстановления">MRV: 18</span>
+          </div>
+        </div>
+
+        <!-- ПРЕСС -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Пресс (Абдоминальные)</span>
+            <div class="slider-value-container">
+              <span class="slider-value" id="val-abs" style="color: var(--color-primary);">0</span>
+            </div>
+          </div>
+          <input type="range" class="input-range" id="slide-abs" min="0" max="30" value="0" oninput="updateLoad('Пресс', this.value)">
+          <div class="limits-bar">
+            <span class="limit-tag" title="В основном работает статически в базах">MEV: 4</span>
+            <span class="limit-tag" title="Maximum Adaptive Volume - Зона максимального роста">MAV: 6-12</span>
+            <span class="limit-tag" title="Maximum Recoverable Volume - Предел восстановления">MRV: 16</span>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="setPreset('mass-gain')">Пресет: Набор массы</button>
+          <button class="btn" onclick="resetAll()">Сбросить всё</button>
+        </div>
+      </div>
+
+      <!-- ВИЗУАЛИЗАЦИЯ И ДИАГНОСТИКА -->
+      <div class="view-panel">
+        
+        <!-- Аналитический Бадж -->
+        <div class="science-badge">
+          <div class="analysis-item">
+            <span class="analysis-label">Мышца под фокусом</span>
+            <span class="analysis-val" id="focus-muscle">—</span>
+          </div>
+          <div class="analysis-item">
+            <span class="analysis-label">Статус & Анализ восстановления</span>
+            <span class="analysis-val" id="focus-status" style="color: var(--text-muted);">Наведите на мышцу</span>
+          </div>
+        </div>
+
+        <div class="model-container">
+          <svg viewBox="0 0 220 208">
+            <!-- VIEW FRONT -->
+            <g id="poly-front" transform="translate(0, 0)" style="filter: drop-shadow(0px 3px 6px rgba(15, 23, 42, 0.08))">
+              <polygon points="42.4489796 2.85714286 40 11.8367347 42.0408163 19.5918367 46.122449 23.2653061 49.7959184 25.3061224 54.6938776 22.4489796 57.5510204 19.1836735 59.1836735 10.2040816 57.1428571 2.44897959 49.7959184 0" fill="#1e293b" stroke="#334155"/>
+              
+              <!-- Грудь -->
+              <polygon points="51.8367347 41.6326531 51.0204082 55.1020408 57.9591837 57.9591837 67.755102 55.5102041 70.6122449 47.3469388 62.0408163 41.6326531" class="muscle-poly" data-muscle="Грудь"/>
+              <polygon points="29.7959184 46.5306122 31.4285714 55.5102041 40.8163265 57.9591837 48.1632653 55.1020408 47.755102 42.0408163 37.5510204 42.0408163" class="muscle-poly" data-muscle="Грудь"/>
+
+              <!-- Пресс -->
+              <polygon points="56.3265306 59.1836735 57.9591837 64.0816327 58.3673469 77.9591837 58.3673469 92.6530612 56.3265306 98.3673469 55.1020408 104.081633 51.4285714 107.755102 51.0204082 84.4897959 50.6122449 67.3469388 51.0204082 57.1428571" class="muscle-poly" data-muscle="Пресс"/>
+              <polygon points="43.6734694 58.7755102 48.5714286 57.1428571 48.9795918 67.3469388 48.5714286 84.4897959 48.1632653 107.346939 44.4897959 103.673469 40.8163265 91.4285714 40.8163265 78.3673469 41.2244898 64.4897959" class="muscle-poly" data-muscle="Пресс"/>
+              <polygon points="68.5714286 63.2653061 67.3469388 57.1428571 58.7755102 59.5918367 60 64.0816327 60.4081633 83.2653061 65.7142857 78.7755102 66.5306122 69.7959184" class="muscle-poly" data-muscle="Пресс"/>
+              <polygon points="33.877551 78.3673469 33.0612245 71.8367347 31.0204082 63.2653061 32.244898 57.1428571 40.8163265 59.1836735 39.1836735 63.2653061 39.1836735 83.6734694" class="muscle-poly" data-muscle="Пресс"/>
+
+              <!-- Бицепс (относится к Руки) -->
+              <polygon points="16.7346939 68.1632653 17.9591837 71.4285714 22.8571429 66.122449 28.9795918 53.877551 27.755102 49.3877551 20.4081633 55.9183673" class="muscle-poly" data-muscle="Руки"/>
+              <polygon points="71.4285714 49.3877551 70.2040816 54.6938776 76.3265306 66.122449 81.6326531 71.8367347 82.8571429 68.9795918 78.7755102 55.5102041" class="muscle-poly" data-muscle="Руки"/>
+
+              <!-- Плечи -->
+              <polygon points="78.3673469 53.0612245 79.5918367 47.755102 79.1836735 41.2244898 75.9183673 37.9591837 71.0204082 36.3265306 72.244898 42.8571429 71.4285714 47.3469388" class="muscle-poly" data-muscle="Плечи"/>
+              <polygon points="28.1632653 47.3469388 21.2244898 53.0612245 20 47.755102 20.4081633 40.8163265 24.4897959 37.1428571 28.5714286 37.1428571 26.9387755 43.2653061" class="muscle-poly" data-muscle="Плечи"/>
+
+              <!-- Квадрицепс -->
+              <polygon points="32.244898 94.6938776 29.3877551 100.816327 28.1632653 111.428571 29.3877551 120 29.3877551 133.469388 32.6530612 138.367347 35.5102041 140 36.3265306 146.530612 40 146.122449 42.8571429 135.102041 44.4897959 129.387755 41.2244898 118.367347 38.3673469 112.244898 34.6938776 98.7755102" class="muscle-poly" data-muscle="Квадрицепс"/>
+              <polygon points="66.9387755 94.6938776 70.2040816 101.22449 71.0204082 111.836735 70.2040816 133.469388 66.5306122 138.367347 72.6530612 145.714286 62.8571429 146.530612 64.0816327 139.591837 61.2244898 130.204082 60.8163265 113.877551 63.2653061 105.714286 64.4897959 100" class="muscle-poly" data-muscle="Квадрицепс"/>
+
+              <text x="50" y="204" textAnchor="middle" class="view-label" font-size="7.5" font-weight="bold" fill="#4b5563">СПЕРЕДИ</text>
+            </g>
+
+            <!-- VIEW BACK -->
+            <g id="poly-back" transform="translate(120, 0)" style="filter: drop-shadow(0px 3px 6px rgba(15, 23, 42, 0.08))">
+              <polygon points="50.6382979 0 45.9574468 0.85106383 40.8510638 5.53191489 40.4255319 12.7659574 45.106383 20 55.7446809 20 59.1489362 13.6170213 59.5744681 4.68085106 55.7446809 1.27659574" fill="#1e293b" stroke="#334155"/>
+              
+              <!-- Широчайшие спины -->
+              <polygon points="31.0638298 38.7234043 28.0851064 48.9361702 28.5106383 55.3191489 34.0425532 75.3191489 47.2340426 71.0638298 47.2340426 66.3829787 36.5957447 54.0425532 33.6170213 41.2765957" class="muscle-poly" data-muscle="Широчайшие"/>
+              <polygon points="68.9361702 38.7234043 71.9148936 49.3617021 71.4893617 56.1702128 65.9574468 75.3191489 52.7659574 71.0638298 52.7659574 66.3829787 63.4042553 54.4680851 66.3829787 41.7021277" class="muscle-poly" data-muscle="Широчайшие"/>
+
+              <!-- Трапеции -->
+              <polygon points="44.6808511 21.7021277 47.6595745 21.7021277 47.2340426 38.2978723 47.6595745 64.6808511 38.2978723 53.1914894 35.3191489 40.8510638 31.0638298 36.5957447 39.1489362 33.1914894 43.8297872 27.2340426" class="muscle-poly" data-muscle="Трапеции"/>
+              <polygon points="52.3404255 21.7021277 55.7446809 21.7021277 56.5957447 27.2340426 60.8510638 32.7659574 68.9361702 36.5957447 64.6808511 40.4255319 61.7021277 53.1914894 52.3404255 64.6808511 52.3191489 38.2978723" class="muscle-poly" data-muscle="Трапеции"/>
+
+              <!-- Трицепс (относится к Руки) -->
+              <polygon points="26.8085106 49.787234 17.8723404 55.7446809 14.4680851 72.3404255 16.5957447 81.7021277 21.7021277 63.8297872 26.8085106 55.7446809" class="muscle-poly" data-muscle="Руки"/>
+              <polygon points="73.6170213 50.212766 82.1276596 55.7446809 85.9574468 73.1914894 83.4042553 82.1276596 77.8723404 62.9787234 73.1914894 55.7446809" class="muscle-poly" data-muscle="Руки"/>
+
+              <!-- Ягодицы -->
+              <polygon points="44.6808511 99.5744681 30.212766 108.510638 29.787234 118.723404 31.4893617 125.957447 47.2340426 121.276596 49.3617021 114.893617" class="muscle-poly" data-muscle="Ягодицы"/>
+              <polygon points="55.3191489 99.1489362 51.0638298 114.468085 52.3404255 120.851064 68.0851064 125.957447 69.787234 119.148936 69.3617021 108.510638" class="muscle-poly" data-muscle="Ягодицы"/>
+
+              <text x="50" y="204" textAnchor="middle" class="view-label" font-size="7.5" font-weight="bold" fill="#4b5563">СЗАДИ</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- ЛЕГЕНДА ГРАДИЕНТА С ПИКТОРГРАММАМИ -->
+        <div class="heatmap-legend">
+          <div class="legend-item">
+            <span class="legend-color" style="background: var(--color-load-0);"></span>
+            <div class="legend-desc">
+              <span class="legend-title">Покой</span>
+              <span>0 подходов (Восстановление)</span>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: var(--color-load-low);"></span>
+            <div class="legend-desc">
+              <span class="legend-title">Тонус</span>
+              <span>&lt; MEV (Минимальный тонус)</span>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: var(--color-load-mev);"></span>
+            <div class="legend-desc">
+              <span class="legend-title">MEV</span>
+              <span>Мин. эффективный объем</span>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: var(--color-load-mav-min);"></span>
+            <div class="legend-desc">
+              <span class="legend-title">Оптимальный MAV</span>
+              <span>Зона идеального роста</span>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: var(--color-load-mav-max);"></span>
+            <div class="legend-desc">
+              <span class="legend-title">Предел MAV</span>
+              <span>Макс. адаптивный объем</span>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: var(--color-load-mrv);"></span>
+            <div class="legend-desc">
+              <span class="legend-title">Предел MRV</span>
+              <span>Граница восстановления</span>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: var(--color-load-over);"></span>
+            <div class="legend-desc">
+              <span class="legend-title">Перетренированность</span>
+              <span>Риск травм и катаболизма</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Научно обоснованные лимиты подходов в неделю по доктору Майку Израэтелю (Renaissance Periodization)
+    const muscleThresholds = {
+      'Грудь': { mev: 8, mavMin: 10, mavMax: 18, mrv: 22 },
+      'Широчайшие': { mev: 10, mavMin: 12, mavMax: 20, mrv: 24 },
+      'Плечи': { mev: 8, mavMin: 10, mavMax: 18, mrv: 22 },
+      'Руки': { mev: 6, mavMin: 8, mavMax: 14, mrv: 18 },
+      'Квадрицепс': { mev: 8, mavMin: 10, mavMax: 16, mrv: 20 },
+      'Ягодицы': { mev: 6, mavMin: 8, mavMax: 14, mrv: 18 },
+      'Пресс': { mev: 4, mavMin: 6, mavMax: 12, mrv: 16 },
+      'Трапеции': { mev: 6, mavMin: 8, mavMax: 14, mrv: 18 }
+    };
+
+    // Текущий объем нагрузок
+    const loads = {
+      'Грудь': 0,
+      'Широчайшие': 0,
+      'Плечи': 0,
+      'Руки': 0,
+      'Квадрицепс': 0,
+      'Ягодицы': 0,
+      'Пресс': 0,
+      'Трапеции': 0
+    };
+
+    // Динамический расчет цвета полигона на основе индивидуальных порогов
+    function getColorForMuscle(muscle, sets) {
+      if (sets === 0) return 'var(--color-load-0)';
+      
+      const lim = muscleThresholds[muscle];
+      if (!lim) return 'var(--color-load-0)';
+
+      if (sets < lim.mev) {
+        return 'var(--color-load-low)';
+      }
+      if (sets === lim.mev) {
+        return 'var(--color-load-mev)';
+      }
+      if (sets < lim.mavMax) {
+        // Линейный переход внутри зоны MAV (от mavMin до mavMax)
+        return 'var(--color-load-mav-min)';
+      }
+      if (sets === lim.mavMax) {
+        return 'var(--color-load-mav-max)';
+      }
+      if (sets <= lim.mrv) {
+        return 'var(--color-load-mrv)';
+      }
+      return 'var(--color-load-over)';
+    }
+
+    // Текстовая формулировка статуса и рекомендаций
+    function getStatusExplanation(muscle, sets) {
+      if (sets === 0) return 'Мышца восстанавливается. Тренировочный стимул отсутствует.';
+      
+      const lim = muscleThresholds[muscle];
+      if (!lim) return '—';
+
+      if (sets < lim.mev) {
+        return `Недостаточно объема для роста. Добавьте еще ${lim.mev - sets} подх. до зоны MEV.`;
+      }
+      if (sets >= lim.mev && sets < lim.mavMin) {
+        return `Минимальный эффективный стимул. Мышца будет расти медленно.`;
+      }
+      if (sets >= lim.mavMin && sets <= lim.mavMax) {
+        return `Идеальный темп развития! Максимальная гипертрофия без перегрузки (MAV).`;
+      }
+      if (sets > lim.mavMax && sets <= lim.mrv) {
+        return `Предельный объем (MRV). Требуется качественный сон, питание и скорый делоад.`;
+      }
+      return `Катаболизм / Перетренированность! Превышение лимита восстановления на ${sets - lim.mrv} подх. Снизьте нагрузку!`;
+    }
+
+    // Обновление слайдера и цвета полигонов
+    function updateLoad(muscle, value) {
+      const sets = parseInt(value);
+      loads[muscle] = sets;
+      
+      // Специфика для Широчайших: тяги задействуют трапеции косвенно (~60% объема)
+      if (muscle === 'Широчайшие') {
+        loads['Трапеции'] = Math.round(sets * 0.6);
+      }
+
+      // Обновление цифры на слайдере
+      const valIdMap = {
+        'Грудь': 'val-chest',
+        'Широчайшие': 'val-back',
+        'Плечи': 'val-shoulders',
+        'Руки': 'val-arms',
+        'Квадрицепс': 'val-legs',
+        'Ягодицы': 'val-glutes',
+        'Пресс': 'val-abs'
+      };
+      if (valIdMap[muscle]) {
+        const valSpan = document.getElementById(valIdMap[muscle]);
+        valSpan.innerText = sets;
+        
+        // Меняем цвет цифры на слайдере под цвет зоны нагрузки
+        valSpan.style.color = getColorForMuscle(muscle, sets);
+        valSpan.style.background = getColorForMuscle(muscle, sets) + '15';
+      }
+
+      // Перекраска полигонов
+      document.querySelectorAll(`polygon[data-muscle="${muscle}"]`).forEach(poly => {
+        poly.style.fill = getColorForMuscle(muscle, sets);
+        // Граница подсвечивается при наличии активности
+        poly.style.stroke = sets > 0 ? getColorForMuscle(muscle, sets) : '#334155';
+        poly.style.strokeWidth = sets > 0 ? '0.6px' : '0.5px';
+      });
+
+      // Перекраска трапеций при обновлении спины
+      if (muscle === 'Широчайшие') {
+        document.querySelectorAll('polygon[data-muscle="Трапеции"]').forEach(poly => {
+          poly.style.fill = getColorForMuscle('Трапеции', loads['Трапеции']);
+          poly.style.stroke = loads['Трапеции'] > 0 ? getColorForMuscle('Трапеции', loads['Трапеции']) : '#334155';
+        });
+      }
+
+      // Обновляем текущий фокус, если наведена или выбрана данная мышца
+      const focusedName = document.getElementById('focus-muscle').innerText;
+      if (focusedName === muscle) {
+        document.getElementById('focus-status').innerText = getStatusExplanation(muscle, sets);
+        document.getElementById('focus-status').style.color = getColorForMuscle(muscle, sets);
+      }
+    }
+
+    // Установка пресетов
+    function setPreset(type) {
+      if (type === 'mass-gain') {
+        // Устанавливаем сбалансированную неделю для роста
+        const values = {
+          'Грудь': 12,      // Оптимальный рост (MAV)
+          'Широчайшие': 16,  // Оптимальный рост (MAV)
+          'Плечи': 12,      // Оптимальный рост (MAV)
+          'Руки': 8,        // Мягкий рост (MEV/MAV)
+          'Квадрицепс': 12,  // Оптимальный рост (MAV)
+          'Ягодицы': 10,     // Оптимальный рост (MAV)
+          'Пресс': 6        // Поддержание / Легкий тонус
+        };
+
+        Object.entries(values).forEach(([m, v]) => {
+          const slideIdMap = {
+            'Грудь': 'slide-chest',
+            'Широчайшие': 'slide-back',
+            'Плечи': 'slide-shoulders',
+            'Руки': 'slide-arms',
+            'Квадрицепс': 'slide-legs',
+            'Ягодицы': 'slide-glutes',
+            'Пресс': 'slide-abs'
+          };
+          if (document.getElementById(slideIdMap[m])) {
+            document.getElementById(slideIdMap[m]).value = v;
+            updateLoad(m, v);
+          }
+        });
+      }
+    }
+
+    // Сбросить всё в 0
+    function resetAll() {
+      const muscles = ['Грудь', 'Широчайшие', 'Плечи', 'Руки', 'Квадрицепс', 'Ягодицы', 'Пресс'];
+      muscles.forEach(m => {
+        const slideIdMap = {
+          'Грудь': 'slide-chest',
+          'Широчайшие': 'slide-back',
+          'Плечи': 'slide-shoulders',
+          'Руки': 'slide-arms',
+          'Квадрицепс': 'slide-legs',
+          'Ягодицы': 'slide-glutes',
+          'Пресс': 'slide-abs'
+        };
+        if (document.getElementById(slideIdMap[m])) {
+          document.getElementById(slideIdMap[m]).value = 0;
+          updateLoad(m, 0);
+        }
+      });
+      document.getElementById('focus-muscle').innerText = '—';
+      document.getElementById('focus-status').innerText = 'Наведите на мышцу';
+      document.getElementById('focus-status').style.color = 'var(--text-muted)';
+    }
+
+    // Инициализация ховеров и событий
+    function init() {
+      // Изначально закрасим все полигоны в Slate-800
+      document.querySelectorAll('.muscle-poly').forEach(poly => {
+        poly.style.fill = 'var(--color-load-0)';
+        poly.style.stroke = '#334155';
+      });
+
+      // Навешиваем обработчики ховеров
+      document.querySelectorAll('.muscle-poly').forEach(poly => {
+        const muscle = poly.getAttribute('data-muscle');
+        
+        poly.addEventListener('mouseenter', () => {
+          document.getElementById('focus-muscle').innerText = muscle;
+          document.getElementById('focus-status').innerText = getStatusExplanation(muscle, loads[muscle]);
+          document.getElementById('focus-status').style.color = getColorForMuscle(muscle, loads[muscle]);
+        });
+      });
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>

@@ -1,0 +1,650 @@
+{
+  "bench-press-barbell": {
+    "image": "images/0025-EIeI8Vf.jpg",
+    "gifUrl": "videos/0025-EIeI8Vf.gif"
+  },
+  "db-press-flat": {
+    "image": "images/3291-zd4P4B2.jpg",
+    "gifUrl": "videos/3291-zd4P4B2.gif"
+  },
+  "db-press-incline-30": {
+    "image": "images/0169-Vh0GsK4.jpg",
+    "gifUrl": "videos/0169-Vh0GsK4.gif"
+  },
+  "db-press-incline-45": {
+    "image": "images/0169-Vh0GsK4.jpg",
+    "gifUrl": "videos/0169-Vh0GsK4.gif"
+  },
+  "db-fly-flat": {
+    "image": "images/0308-yz9nUhF.jpg",
+    "gifUrl": "videos/0308-yz9nUhF.gif"
+  },
+  "cable-crossover": {
+    "image": "images/1320-UFGF6gk.jpg",
+    "gifUrl": "videos/1320-UFGF6gk.gif"
+  },
+  "low-cable-fly": {
+    "image": "images/0179-FVmZVhk.jpg",
+    "gifUrl": "videos/0179-FVmZVhk.gif"
+  },
+  "chest-dips": {
+    "image": "images/3287-LkoAWAE.jpg",
+    "gifUrl": "videos/3287-LkoAWAE.gif"
+  },
+  "decline-barbell-press": {
+    "image": "images/0033-GrO65fd.jpg",
+    "gifUrl": "videos/0033-GrO65fd.gif"
+  },
+  "incline-barbell-press": {
+    "image": "images/0047-3TZduzM.jpg",
+    "gifUrl": "videos/0047-3TZduzM.gif"
+  },
+  "svend-press": {
+    "image": "images/0856-I1OBLnn.jpg",
+    "gifUrl": "videos/0856-I1OBLnn.gif"
+  },
+  "pushups-wide": {
+    "image": "images/1429-Qqi7bko.jpg",
+    "gifUrl": "videos/1429-Qqi7bko.gif"
+  },
+  "chest-press-machine": {
+    "image": "images/1301-wDN97Ca.jpg",
+    "gifUrl": "videos/1301-wDN97Ca.gif"
+  },
+  "pec-deck-fly": {
+    "image": "images/0308-yz9nUhF.jpg",
+    "gifUrl": "videos/0308-yz9nUhF.gif"
+  },
+  "push-up": {
+    "image": "images/0662-I4hDWkc.jpg",
+    "gifUrl": "videos/0662-I4hDWkc.gif"
+  },
+  "lat-pulldown-wide": {
+    "image": "images/0197-qdRxqCj.jpg",
+    "gifUrl": "videos/0197-qdRxqCj.gif"
+  },
+  "lat-pulldown-narrow": {
+    "image": "images/0197-qdRxqCj.jpg",
+    "gifUrl": "videos/0197-qdRxqCj.gif"
+  },
+  "barbell-row-incline": {
+    "image": "images/0049-dmgMp3n.jpg",
+    "gifUrl": "videos/0049-dmgMp3n.gif"
+  },
+  "cable-row-horizontal": {
+    "image": "images/0180-hvV79Si.jpg",
+    "gifUrl": "videos/0180-hvV79Si.gif"
+  },
+  "tbar-row": {
+    "image": "images/0499-bZGHsAZ.jpg",
+    "gifUrl": "videos/0499-bZGHsAZ.gif"
+  },
+  "db-row-one-arm": {
+    "image": "images/1003-w1NOByi.jpg",
+    "gifUrl": "videos/1003-w1NOByi.gif"
+  },
+  "straight-arm-pulldown": {
+    "image": "images/0238-x69MAlq.jpg",
+    "gifUrl": "videos/0238-x69MAlq.gif"
+  },
+  "pulldown-behind-neck": {
+    "image": "images/1325-CmEr4pM.jpg",
+    "gifUrl": "videos/1325-CmEr4pM.gif"
+  },
+  "chin-ups": {
+    "image": "images/0253-G70mEAJ.jpg",
+    "gifUrl": "videos/0253-G70mEAJ.gif"
+  },
+  "db-pullover": {
+    "image": "images/2285-4U7iLb5.jpg",
+    "gifUrl": "videos/2285-4U7iLb5.gif"
+  },
+  "lat-pulldown-one-arm": {
+    "image": "images/0197-qdRxqCj.jpg",
+    "gifUrl": "videos/0197-qdRxqCj.gif"
+  },
+  "rack-pulls": {
+    "image": "images/0074-za9Ni4z.jpg",
+    "gifUrl": "videos/0074-za9Ni4z.gif"
+  },
+  "row-machine-wide": {
+    "image": "images/0218-qcY50ZD.jpg",
+    "gifUrl": "videos/0218-qcY50ZD.gif"
+  },
+  "rows-neutral-db": {
+    "image": "images/0352-pP8wP2P.jpg",
+    "gifUrl": "videos/0352-pP8wP2P.gif"
+  },
+  "shrugs-barbell": {
+    "image": "images/0054-t8iSghb.jpg",
+    "gifUrl": "videos/0054-t8iSghb.gif"
+  },
+  "shrugs-cable": {
+    "image": "images/0179-FVmZVhk.jpg",
+    "gifUrl": "videos/0179-FVmZVhk.gif"
+  },
+  "face-pull-rope": {
+    "image": "images/3293-72BC5Za.jpg",
+    "gifUrl": "videos/3293-72BC5Za.gif"
+  },
+  "kelso-row": {
+    "image": "images/0499-bZGHsAZ.jpg",
+    "gifUrl": "videos/0499-bZGHsAZ.gif"
+  },
+  "smith-machine-shrugs": {
+    "image": "images/1683-zILLZ98.jpg",
+    "gifUrl": "videos/1683-zILLZ98.gif"
+  },
+  "overhead-shrugs": {
+    "image": "images/1636-wDUqY2u.jpg",
+    "gifUrl": "videos/1636-wDUqY2u.gif"
+  },
+  "high-pull-barbell": {
+    "image": "images/0074-za9Ni4z.jpg",
+    "gifUrl": "videos/0074-za9Ni4z.gif"
+  },
+  "db-rear-delt-row": {
+    "image": "images/0762-nFUwqG6.jpg",
+    "gifUrl": "videos/0762-nFUwqG6.gif"
+  },
+  "y-raises-incline": {
+    "image": "images/3541-PbzNu7c.jpg",
+    "gifUrl": "videos/3541-PbzNu7c.gif"
+  },
+  "hyperextension-weighted": {
+    "image": "images/0835-8urJS9b.jpg",
+    "gifUrl": "videos/0835-8urJS9b.gif"
+  },
+  "good-mornings": {
+    "image": "images/0044-XlZ4lAC.jpg",
+    "gifUrl": "videos/0044-XlZ4lAC.gif"
+  },
+  "superman": {
+    "image": "images/0803-4GqRrAk.jpg",
+    "gifUrl": "videos/0803-4GqRrAk.gif"
+  },
+  "bird-dog": {
+    "image": "images/1366-01qpYSe.jpg",
+    "gifUrl": "videos/1366-01qpYSe.gif"
+  },
+  "back-extension-machine": {
+    "image": "images/0573-rUXfn3R.jpg",
+    "gifUrl": "videos/0573-rUXfn3R.gif"
+  },
+  "reverse-hyperextension": {
+    "image": "images/0593-Krmb3cB.jpg",
+    "gifUrl": "videos/0593-Krmb3cB.gif"
+  },
+  "deadlift-deficit": {
+    "image": "images/0032-ila4NZS.jpg",
+    "gifUrl": "videos/0032-ila4NZS.gif"
+  },
+  "jefferson-curl": {
+    "image": "images/1016-vUTfFHw.jpg",
+    "gifUrl": "videos/1016-vUTfFHw.gif"
+  },
+  "archer-pullups": {
+    "image": "images/3293-72BC5Za.jpg",
+    "gifUrl": "videos/3293-72BC5Za.gif"
+  },
+  "db-shoulder-press-seated": {
+    "image": "images/0765-xUwnBMT.jpg",
+    "gifUrl": "videos/0765-xUwnBMT.gif"
+  },
+  "barbell-overhead-press": {
+    "image": "images/0091-kTbSH9h.jpg",
+    "gifUrl": "videos/0091-kTbSH9h.gif"
+  },
+  "arnold-press": {
+    "image": "images/2137-Xy4jlWA.jpg",
+    "gifUrl": "videos/2137-Xy4jlWA.gif"
+  },
+  "db-lateral-raises": {
+    "image": "images/0178-goJ6ezq.jpg",
+    "gifUrl": "videos/0178-goJ6ezq.gif"
+  },
+  "cable-lateral-raise": {
+    "image": "images/0178-goJ6ezq.jpg",
+    "gifUrl": "videos/0178-goJ6ezq.gif"
+  },
+  "front-raise-db": {
+    "image": "images/0978-TFA88iB.jpg",
+    "gifUrl": "videos/0978-TFA88iB.gif"
+  },
+  "upright-row-barbell": {
+    "image": "images/0120-UDlhcO8.jpg",
+    "gifUrl": "videos/0120-UDlhcO8.gif"
+  },
+  "rear-delt-fly": {
+    "image": "images/0378-8DiFDVA.jpg",
+    "gifUrl": "videos/0378-8DiFDVA.gif"
+  },
+  "machine-shoulder-press": {
+    "image": "images/0219-PzQanLE.jpg",
+    "gifUrl": "videos/0219-PzQanLE.gif"
+  },
+  "push-press-barbell": {
+    "image": "images/0025-EIeI8Vf.jpg",
+    "gifUrl": "videos/0025-EIeI8Vf.gif"
+  },
+  "lateral-raises-lying": {
+    "image": "images/0348-53Ttlck.jpg",
+    "gifUrl": "videos/0348-53Ttlck.gif"
+  },
+  "front-raise-barbell": {
+    "image": "images/0041-b2Uoz54.jpg",
+    "gifUrl": "videos/0041-b2Uoz54.gif"
+  },
+  "cable-rear-delt-fly": {
+    "image": "images/0202-yUdIGNs.jpg",
+    "gifUrl": "videos/0202-yUdIGNs.gif"
+  },
+  "face-pull-db": {
+    "image": "images/0670-CbFSYC1.jpg",
+    "gifUrl": "videos/0670-CbFSYC1.gif"
+  },
+  "barbell-biceps-curl": {
+    "image": "images/0023-Yza7XrQ.jpg",
+    "gifUrl": "videos/0023-Yza7XrQ.gif"
+  },
+  "ez-bar-curl": {
+    "image": "images/2404-tJ5nYqo.jpg",
+    "gifUrl": "videos/2404-tJ5nYqo.gif"
+  },
+  "db-hammer-curl": {
+    "image": "images/0313-slDvUAU.jpg",
+    "gifUrl": "videos/0313-slDvUAU.gif"
+  },
+  "incline-db-curl": {
+    "image": "images/0318-ae9UoXQ.jpg",
+    "gifUrl": "videos/0318-ae9UoXQ.gif"
+  },
+  "concentration-curl": {
+    "image": "images/0976-kmVVAfu.jpg",
+    "gifUrl": "videos/0976-kmVVAfu.gif"
+  },
+  "spider-curl": {
+    "image": "images/0454-Ye5Qxb0.jpg",
+    "gifUrl": "videos/0454-Ye5Qxb0.gif"
+  },
+  "cable-curl": {
+    "image": "images/0868-G08RZcQ.jpg",
+    "gifUrl": "videos/0868-G08RZcQ.gif"
+  },
+  "preacher-curl-ez": {
+    "image": "images/1627-hacCyUv.jpg",
+    "gifUrl": "videos/1627-hacCyUv.gif"
+  },
+  "drag-curl": {
+    "image": "images/1632-dXz8zjF.jpg",
+    "gifUrl": "videos/1632-dXz8zjF.gif"
+  },
+  "zottman-curl": {
+    "image": "images/0439-kXaIn5A.jpg",
+    "gifUrl": "videos/0439-kXaIn5A.gif"
+  },
+  "biceps-machine": {
+    "image": "images/0140-guT8YnS.jpg",
+    "gifUrl": "videos/0140-guT8YnS.gif"
+  },
+  "chin-ups-weighted": {
+    "image": "images/0253-G70mEAJ.jpg",
+    "gifUrl": "videos/0253-G70mEAJ.gif"
+  },
+  "bench-press-narrow-grip": {
+    "image": "images/1308-zoOvPcx.jpg",
+    "gifUrl": "videos/1308-zoOvPcx.gif"
+  },
+  "skull-crushers": {
+    "image": "images/0035-LMGXZn8.jpg",
+    "gifUrl": "videos/0035-LMGXZn8.gif"
+  },
+  "french-press-barbell": {
+    "image": "images/0071-wnEscH8.jpg",
+    "gifUrl": "videos/0071-wnEscH8.gif"
+  },
+  "triceps-pushdown-rope": {
+    "image": "images/0241-gAwDzB3.jpg",
+    "gifUrl": "videos/0241-gAwDzB3.gif"
+  },
+  "overhead-triceps-db": {
+    "image": "images/0643-Z5YStHW.jpg",
+    "gifUrl": "videos/0643-Z5YStHW.gif"
+  },
+  "cable-overhead-extension": {
+    "image": "images/1722-1xHyxys.jpg",
+    "gifUrl": "videos/1722-1xHyxys.gif"
+  },
+  "triceps-dips": {
+    "image": "images/0815-7aVz15j.jpg",
+    "gifUrl": "videos/0815-7aVz15j.gif"
+  },
+  "kickbacks-db": {
+    "image": "images/1734-cAvTaSg.jpg",
+    "gifUrl": "videos/1734-cAvTaSg.gif"
+  },
+  "dips-bench": {
+    "image": "images/1754-gtO1ErP.jpg",
+    "gifUrl": "videos/1754-gtO1ErP.gif"
+  },
+  "diamond-pushups": {
+    "image": "images/0283-soIB2rj.jpg",
+    "gifUrl": "videos/0283-soIB2rj.gif"
+  },
+  "triceps-pressdown-bar": {
+    "image": "images/1748-6CKUx7o.jpg",
+    "gifUrl": "videos/1748-6CKUx7o.gif"
+  },
+  "wrist-curls-barbell": {
+    "image": "images/0126-82LxxkW.jpg",
+    "gifUrl": "videos/0126-82LxxkW.gif"
+  },
+  "reverse-wrist-curls-barbell": {
+    "image": "images/0082-LsZkfU6.jpg",
+    "gifUrl": "videos/0082-LsZkfU6.gif"
+  },
+  "reverse-barbell-curl": {
+    "image": "images/0080-xNrS20v.jpg",
+    "gifUrl": "videos/0080-xNrS20v.gif"
+  },
+  "fat-grip-holds": {
+    "image": "images/1429-Qqi7bko.jpg",
+    "gifUrl": "videos/1429-Qqi7bko.gif"
+  },
+  "wrist-roller": {
+    "image": "images/1428-2zNKRUB.jpg",
+    "gifUrl": "videos/1428-2zNKRUB.gif"
+  },
+  "farmer-walk": {
+    "image": "images/2133-qPEzJjA.jpg",
+    "gifUrl": "videos/2133-qPEzJjA.gif"
+  },
+  "db-hammer-curl-crossbody": {
+    "image": "images/0312-2NpxjC1.jpg",
+    "gifUrl": "videos/0312-2NpxjC1.gif"
+  },
+  "squat-barbell": {
+    "image": "images/0043-qXTaZnJ.jpg",
+    "gifUrl": "videos/0043-qXTaZnJ.gif"
+  },
+  "front-squat": {
+    "image": "images/0042-zG0zs85.jpg",
+    "gifUrl": "videos/0042-zG0zs85.gif"
+  },
+  "leg-press": {
+    "image": "images/3291-zd4P4B2.jpg",
+    "gifUrl": "videos/3291-zd4P4B2.gif"
+  },
+  "hack-squat": {
+    "image": "images/0743-Qa55kX1.jpg",
+    "gifUrl": "videos/0743-Qa55kX1.gif"
+  },
+  "bulgarian-split-squat": {
+    "image": "images/0809-QpXqiq8.jpg",
+    "gifUrl": "videos/0809-QpXqiq8.gif"
+  },
+  "wall-sit": {
+    "image": "images/0001-2gPfomN.jpg",
+    "gifUrl": "videos/0001-2gPfomN.gif"
+  },
+  "goblet-squat": {
+    "image": "images/1760-yn8yg1r.jpg",
+    "gifUrl": "videos/1760-yn8yg1r.gif"
+  },
+  "box-squat": {
+    "image": "images/1004-TUZLh71.jpg",
+    "gifUrl": "videos/1004-TUZLh71.gif"
+  },
+  "overhead-squat": {
+    "image": "images/0069-gfk9kD4.jpg",
+    "gifUrl": "videos/0069-gfk9kD4.gif"
+  },
+  "sissy-squat": {
+    "image": "images/1489-xdYPUtE.jpg",
+    "gifUrl": "videos/1489-xdYPUtE.gif"
+  },
+  "pistol-squat": {
+    "image": "images/0544-5bpPTHv.jpg",
+    "gifUrl": "videos/0544-5bpPTHv.gif"
+  },
+  "step-ups-db": {
+    "image": "images/1008-d5bTEPV.jpg",
+    "gifUrl": "videos/1008-d5bTEPV.gif"
+  },
+  "walking-lunges": {
+    "image": "images/1460-IZVHb27.jpg",
+    "gifUrl": "videos/1460-IZVHb27.gif"
+  },
+  "romanian-deadlift": {
+    "image": "images/0085-wQ2c4XD.jpg",
+    "gifUrl": "videos/0085-wQ2c4XD.gif"
+  },
+  "leg-curls-lying-main": {
+    "image": "images/0586-17lJ1kr.jpg",
+    "gifUrl": "videos/0586-17lJ1kr.gif"
+  },
+  "leg-curls-seated": {
+    "image": "images/1458-jtFKbt5.jpg",
+    "gifUrl": "videos/1458-jtFKbt5.gif"
+  },
+  "nordic-hamstring": {
+    "image": "images/1511-99rWm7w.jpg",
+    "gifUrl": "videos/1511-99rWm7w.gif"
+  },
+  "good-mornings-hamstrings": {
+    "image": "images/3759-XsCcxCC.jpg",
+    "gifUrl": "videos/3759-XsCcxCC.gif"
+  },
+  "sliding-leg-curls": {
+    "image": "images/1437-mtXengz.jpg",
+    "gifUrl": "videos/1437-mtXengz.gif"
+  },
+  "deadlift-straight-leg": {
+    "image": "images/1010-KUaoUV8.jpg",
+    "gifUrl": "videos/1010-KUaoUV8.gif"
+  },
+  "single-leg-rdl": {
+    "image": "images/0725-MUic5zN.jpg",
+    "gifUrl": "videos/0725-MUic5zN.gif"
+  },
+  "hip-thrust-barbell": {
+    "image": "images/0043-qXTaZnJ.jpg",
+    "gifUrl": "videos/0043-qXTaZnJ.gif"
+  },
+  "cable-kickback-glutes": {
+    "image": "images/0860-HEJ6DIX.jpg",
+    "gifUrl": "videos/0860-HEJ6DIX.gif"
+  },
+  "abduction-machine-glutes": {
+    "image": "images/1683-zILLZ98.jpg",
+    "gifUrl": "videos/1683-zILLZ98.gif"
+  },
+  "glute-bridge-bodyweight": {
+    "image": "images/3013-u0cNiij.jpg",
+    "gifUrl": "videos/3013-u0cNiij.gif"
+  },
+  "single-leg-glute-bridge": {
+    "image": "images/3013-u0cNiij.jpg",
+    "gifUrl": "videos/3013-u0cNiij.gif"
+  },
+  "db-sumo-squat": {
+    "image": "images/3142-dzz6BiV.jpg",
+    "gifUrl": "videos/3142-dzz6BiV.gif"
+  },
+  "donkey-kicks": {
+    "image": "images/0459-UVo2Qs2.jpg",
+    "gifUrl": "videos/0459-UVo2Qs2.gif"
+  },
+  "clamshell-band": {
+    "image": "images/1003-w1NOByi.jpg",
+    "gifUrl": "videos/1003-w1NOByi.gif"
+  },
+  "reverse-lunges-barbell": {
+    "image": "images/0080-xNrS20v.jpg",
+    "gifUrl": "videos/0080-xNrS20v.gif"
+  },
+  "curtsy-lunge-db": {
+    "image": "images/3582-PM1PZjg.jpg",
+    "gifUrl": "videos/3582-PM1PZjg.gif"
+  },
+  "calf-raises-standing": {
+    "image": "images/1375-yl2IYyy.jpg",
+    "gifUrl": "videos/1375-yl2IYyy.gif"
+  },
+  "calf-raises-seated": {
+    "image": "images/2335-Ie9UGty.jpg",
+    "gifUrl": "videos/2335-Ie9UGty.gif"
+  },
+  "calf-press-leg-press": {
+    "image": "images/0738-qCNVnaU.jpg",
+    "gifUrl": "videos/0738-qCNVnaU.gif"
+  },
+  "single-leg-calf-raise": {
+    "image": "images/0999-9JprnPh.jpg",
+    "gifUrl": "videos/0999-9JprnPh.gif"
+  },
+  "donkey-calf-raises": {
+    "image": "images/0284-u5ESqzH.jpg",
+    "gifUrl": "videos/0284-u5ESqzH.gif"
+  },
+  "tibialis-raises": {
+    "image": "images/0763-ywaNfuh.jpg",
+    "gifUrl": "videos/0763-ywaNfuh.gif"
+  },
+  "jumping-rope": {
+    "image": "images/0680-yaAxcQr.jpg",
+    "gifUrl": "videos/0680-yaAxcQr.gif"
+  },
+  "calf-raises-smith": {
+    "image": "images/0763-ywaNfuh.jpg",
+    "gifUrl": "videos/0763-ywaNfuh.gif"
+  },
+  "ab-crunch-mat": {
+    "image": "images/0274-TFqbd8t.jpg",
+    "gifUrl": "videos/0274-TFqbd8t.gif"
+  },
+  "hanging-leg-raises": {
+    "image": "images/0472-I3tsCnC.jpg",
+    "gifUrl": "videos/0472-I3tsCnC.gif"
+  },
+  "cable-crunch-kneeling": {
+    "image": "images/0175-WW95auq.jpg",
+    "gifUrl": "videos/0175-WW95auq.gif"
+  },
+  "plank-classic": {
+    "image": "images/3665-hCjGsRQ.jpg",
+    "gifUrl": "videos/3665-hCjGsRQ.gif"
+  },
+  "russian-twist": {
+    "image": "images/0687-XVDdcoj.jpg",
+    "gifUrl": "videos/0687-XVDdcoj.gif"
+  },
+  "decline-bench-situp": {
+    "image": "images/0753-ETZfAbZ.jpg",
+    "gifUrl": "videos/0753-ETZfAbZ.gif"
+  },
+  "woodchopper-cable": {
+    "image": "images/0151-7xI5MXA.jpg",
+    "gifUrl": "videos/0151-7xI5MXA.gif"
+  },
+  "lying-leg-raises-flat": {
+    "image": "images/0620-WhuFnR7.jpg",
+    "gifUrl": "videos/0620-WhuFnR7.gif"
+  },
+  "dead-bug": {
+    "image": "images/0276-iny3m5y.jpg",
+    "gifUrl": "videos/0276-iny3m5y.gif"
+  },
+  "hanging-knee-raises": {
+    "image": "images/1761-BaE7O6U.jpg",
+    "gifUrl": "videos/1761-BaE7O6U.gif"
+  },
+  "bicycles-crunch": {
+    "image": "images/0634-szIn2UK.jpg",
+    "gifUrl": "videos/0634-szIn2UK.gif"
+  },
+  "side-plank-hold": {
+    "image": "images/0664-KhHJ338.jpg",
+    "gifUrl": "videos/0664-KhHJ338.gif"
+  },
+  "toes-to-bar": {
+    "image": "images/3638-PrQbjvB.jpg",
+    "gifUrl": "videos/3638-PrQbjvB.gif"
+  },
+  "hollow-body-hold": {
+    "image": "images/0262-rbu5UUb.jpg",
+    "gifUrl": "videos/0262-rbu5UUb.gif"
+  },
+  "windshield-wipers": {
+    "image": "images/0500-11wrviz.jpg",
+    "gifUrl": "videos/0500-11wrviz.gif"
+  },
+  "neck-flexion-lying": {
+    "image": "images/2312-AQIhRjM.jpg",
+    "gifUrl": "videos/2312-AQIhRjM.gif"
+  },
+  "neck-extension-lying": {
+    "image": "images/0057-EMpUwRI.jpg",
+    "gifUrl": "videos/0057-EMpUwRI.gif"
+  },
+  "isometric-neck-holds": {
+    "image": "images/0716-oQRJYkC.jpg",
+    "gifUrl": "videos/0716-oQRJYkC.gif"
+  },
+  "neck-harness-extension": {
+    "image": "images/1718-4CBIBOM.jpg",
+    "gifUrl": "videos/1718-4CBIBOM.gif"
+  },
+  "neck-side-flexion": {
+    "image": "images/1403-x2chWLO.jpg",
+    "gifUrl": "videos/1403-x2chWLO.gif"
+  },
+  "cable-adduction": {
+    "image": "images/0168-hBGWILP.jpg",
+    "gifUrl": "videos/0168-hBGWILP.gif"
+  },
+  "adductor-machine": {
+    "image": "images/1683-zILLZ98.jpg",
+    "gifUrl": "videos/1683-zILLZ98.gif"
+  },
+  "copenhagen-plank": {
+    "image": "images/3665-hCjGsRQ.jpg",
+    "gifUrl": "videos/3665-hCjGsRQ.gif"
+  },
+  "squat-plie-db": {
+    "image": "images/3769-gUjqdei.jpg",
+    "gifUrl": "videos/3769-gUjqdei.gif"
+  },
+  "side-lunges-db": {
+    "image": "images/0002-Hy9D21L.jpg",
+    "gifUrl": "videos/0002-Hy9D21L.gif"
+  },
+  "cable-adduction-lying": {
+    "image": "images/1634-otqIxU4.jpg",
+    "gifUrl": "videos/1634-otqIxU4.gif"
+  },
+  "fire-hydrant-band": {
+    "image": "images/0991-VtTbiP3.jpg",
+    "gifUrl": "videos/0991-VtTbiP3.gif"
+  },
+  "side-lying-leg-raise": {
+    "image": "images/0408-fTlkJop.jpg",
+    "gifUrl": "videos/0408-fTlkJop.gif"
+  },
+  "monster-walks-band": {
+    "image": "images/0972-tZkGYZ9.jpg",
+    "gifUrl": "videos/0972-tZkGYZ9.gif"
+  },
+  "ab-roller-serratus": {
+    "image": "images/2202-oMypNrz.jpg",
+    "gifUrl": "videos/2202-oMypNrz.gif"
+  },
+  "dumbbell-serratus-shrug": {
+    "image": "images/0305-cwsAI4G.jpg",
+    "gifUrl": "videos/0305-cwsAI4G.gif"
+  },
+  "cable-woodchop-high-low": {
+    "image": "images/0167-ZSJNetl.jpg",
+    "gifUrl": "videos/0167-ZSJNetl.gif"
+  }
+}

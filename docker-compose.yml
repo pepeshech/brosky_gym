@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  brosky-gym:
+    image: ghcr.io/brosky-gym-org/brosky-gym:main # Обновите на ваш реальный репозиторий, например: ghcr.io/your-username/brosky-gym:main
+    container_name: brosky-gym-app
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

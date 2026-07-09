@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brosky Gym - Дорожная карта улучшений & Архитектурный аудит</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #080b11;
+      --card-bg: rgba(17, 24, 39, 0.7);
+      --card-border: rgba(255, 255, 255, 0.06);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      
+      --color-primary: #3b82f6;
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+      --color-purple: #8b5cf6;
+      
+      --shadow-neon: 0 0 20px rgba(59, 130, 246, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+      padding: 40px 20px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    header {
+      max-width: 1000px;
+      margin: 0 auto 40px auto;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 2.8rem;
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* ФИЛЬТРЫ */
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+
+    .filter-btn.active {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+    }
+
+    /* СЕТКА КАРТОЧЕК */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* КАРТОЧКА */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 28px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-color, var(--color-primary));
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: var(--shadow-neon);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .card-title-group {
+      flex: 1;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-high { background: rgba(239, 68, 68, 0.15); color: var(--color-danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+    .badge-medium { background: rgba(245, 158, 11, 0.15); color: var(--color-warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+    .badge-low { background: rgba(16, 185, 129, 0.15); color: var(--color-success); border: 1px solid rgba(16, 185, 129, 0.2); }
+
+    .badge-arch { background: rgba(139, 92, 246, 0.15); color: var(--color-purple); border: 1px solid rgba(139, 92, 246, 0.2); }
+    .badge-ux { background: rgba(59, 130, 246, 0.15); color: var(--color-primary); border: 1px solid rgba(59, 130, 246, 0.2); }
+
+    .card h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -0.02em;
+    }
+
+    /* ИНТЕРАКТИВНЫЕ ВКЛАДКИ ВНУТРИ КАРТОЧКИ */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 20px;
+      gap: 16px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 0;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-color, var(--color-primary));
+      font-weight: 600;
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--accent-color, var(--color-primary));
+    }
+
+    .tab-content {
+      display: none;
+      min-height: 110px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* СПЕЦИФИЧЕСКИЙ КОНТЕНТ */
+    .text-block p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+    }
+
+    .criticism-box {
+      background: rgba(239, 68, 68, 0.04);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 10px;
+    }
+
+    .criticism-title {
+      color: var(--color-danger);
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .criticism-title svg {
+      fill: var(--color-danger);
+    }
+
+    .criticism-text {
+      color: #fca5a5;
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    .todo-list {
+      list-style: none;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .todo-item::before {
+      content: '⚡';
+      color: var(--accent-color, var(--color-primary));
+    }
+
+    /* ИНДИКАТОРЫ */
+    .metrics-bar {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-t: 1px dashed rgba(255, 255, 255, 0.08);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .metric-value {
+      font-weight: 600;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Brosky Gym</h1>
+    <p class="subtitle">Архитектурный аудит, долгосрочный план развития и беспристрастная самокритика текущих решений</p>
+  </header>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="filterRoadmap('all')">Все улучшения</button>
+    <button class="filter-btn" onclick="filterRoadmap('high')">Высокий приоритет</button>
+    <button class="filter-btn" onclick="filterRoadmap('medium')">Средний приоритет</button>
+    <button class="filter-btn" onclick="filterRoadmap('arch')">Архитектура</button>
+    <button class="filter-btn" onclick="filterRoadmap('ux')">UX / Функционал</button>
+  </div>
+
+  <div class="grid" id="roadmap-grid">
+
+    <!-- КАРТОЧКА 1: INDEXEDDB -->
+    <div class="card" data-priority="high" data-category="arch" style="--accent-color: var(--color-danger);">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-meta">
+            <span class="badge badge-high">Высокий приоритет</span>
+            <span class="badge badge-arch">Архитектура</span>
+          </div>
+          <h2>1. Миграция хранилища: с LocalStorage на IndexedDB</h2>
+        </div>
+      </div>
+      
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this, 'c1-what')">Суть задачи</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c1-why')">Зачем это нужно</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c1-crit')">Самокритика</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c1-todo')">Реализация</button>
+      </div>
+
+      <div class="tab-content active" id="c1-what">
+        <div class="text-block">
+          <p>Замена стандартного localStorage на IndexedDB с использованием библиотеки <strong>localForage</strong> или кастомного адаптера для Zustand-хранилища.</p>
+          <p>Вся история тренировок, замеров и питания в Brosky Gym в данный момент пишется в один JSON-объект в localStorage.</p>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="c1-why">
+        <div class="text-block">
+          <p><strong>Снятие лимита в 5 МБ:</strong> Год активных тренировок с логами подходов, повторений, замеров веса и шагов быстро исчерпает лимит localStorage, вызвав фатальный сбой <code>QuotaExceededError</code>.</p>
+          <p><strong>Безопасность данных:</strong> Браузеры склонны стирать localStorage при дефиците памяти. IndexedDB более надежен и устойчив к автоматической чистке кэша браузером.</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="c1-crit">
+        <div class="criticism-box">
+          <div class="criticism-title">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            Почему это сложно / опасное решение?
+          </div>
+          <p class="criticism-text">"Асинхронность IndexedDB усложнит Zustand-стор. Придется переписывать инициализацию приложения: лоадеры, экраны ожидания, обработку race-conditions при загрузке. Если сделать миграцию небрежно, при первом обновлении пользователи потеряют всю историю, накопленную в localStorage."</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="c1-todo">
+        <ul class="todo-list">
+          <li class="todo-item">Подключить localForage для асинхронного Zustand-persist.</li>
+          <li class="todo-item">Написать скрипт миграции, который при первом запуске считывает данные из localStorage, переносит их в IndexedDB и безопасно очищает старый ключ.</li>
+          <li class="todo-item">Добавить индикатор загрузки БД на стартовый сплэш-экран PWA.</li>
+        </ul>
+      </div>
+
+      <div class="metrics-bar">
+        <span>Сложность: <span class="metric-value">Высокая</span></span>
+        <span>Опасность: <span class="metric-value">Критическая</span></span>
+        <span>Сроки: <span class="metric-value">2-3 дня</span></span>
+      </div>
+    </div>
+
+    <!-- КАРТОЧКА 2: HEATMAP АТЛАСА -->
+    <div class="card" data-priority="medium" data-category="ux" style="--accent-color: var(--color-primary);">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-meta">
+            <span class="badge badge-medium">Средний приоритет</span>
+            <span class="badge badge-ux">UX / Геймификация</span>
+          </div>
+          <h2>2. Динамический атлас: Heatmap тренировочной нагрузки</h2>
+        </div>
+      </div>
+      
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this, 'c2-what')">Суть задачи</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c2-why')">Зачем это нужно</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c2-crit')">Самокритика</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c2-todo')">Реализация</button>
+      </div>
+
+      <div class="tab-content active" id="c2-what">
+        <div class="text-block">
+          <p>Интеграция анатомического атласа с историей тренировок. Окраска мышечных групп на манекене в зависимости от суммарного тренировочного объема (КПШ / тоннаж) за последние 7-14 дней.</p>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="c2-why">
+        <div class="text-block">
+          <p><strong>Визуализация баланса тела:</strong> Атлет наглядно увидит перекосы в тренировках (например, ярко-красная грудь при бледно-синей спине).</p>
+          <p><strong>Повышение удержания (Retention):</strong> Игровой эффект "закрашивания" манекена мотивирует тренироваться регулярно и прорабатывать отстающие группы мышц.</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="c2-crit">
+        <div class="criticism-box">
+          <div class="criticism-title">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            Почему это сложно / опасное решение?
+          </div>
+          <p class="criticism-text">"Атлас сейчас — это чистый UI-фильтр. Если мы начнем парсить всю историю подходов на лету для пересчета цвета полигонов при каждом рендере, PWA на слабых телефонах начнет сильно лагать. Нам нужно разработать хитрый инкрементальный кэш объемов в Zustand-сторе."</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="c2-todo">
+        <ul class="todo-list">
+          <li class="todo-item">Создать структуру хранения недельного объема нагрузки по мышечным группам в Zustand.</li>
+          <li class="todo-item">Обновлять кэш объемов при сохранении или удалении тренировочной сессии.</li>
+          <li class="todo-item">Связать интенсивность цвета заливки (от светло-серого до глубокого синего или янтарного) с набранным объемом.</li>
+        </ul>
+      </div>
+
+      <div class="metrics-bar">
+        <span>Сложность: <span class="metric-value">Средняя</span></span>
+        <span>Опасность: <span class="metric-value">Низкая</span></span>
+        <span>Сроки: <span class="metric-value">1-2 дня</span></span>
+      </div>
+    </div>
+
+    <!-- КАРТОЧКА 3: ВАЛИДАЦИЯ ДАННЫХ ZOD -->
+    <div class="card" data-priority="medium" data-category="arch" style="--accent-color: var(--color-purple);">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-meta">
+            <span class="badge badge-medium">Средний приоритет</span>
+            <span class="badge badge-arch">Архитектура</span>
+          </div>
+          <h2>3. Безопасность схем данных: Валидация через Zod</h2>
+        </div>
+      </div>
+      
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this, 'c3-what')">Суть задачи</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c3-why')">Зачем это нужно</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c3-crit')">Самокритика</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c3-todo')">Реализация</button>
+      </div>
+
+      <div class="tab-content active" id="c3-what">
+        <div class="text-block">
+          <p>Внедрение библиотеки валидации схем <strong>Zod</strong> на стыке загрузки кэша Zustand и при импорте резервных копий JSON.</p>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="c3-why">
+        <div class="text-block">
+          <p><strong>Предотвращение «белого экрана»:</strong> Если структура данных изменится в новой версии (например, мы добавим новые обязательные поля в модель `WorkoutSession`), старый кэш в браузере сломает рендеринг у пользователей. Валидация Zod отсечет битые поля и применит безопасные дефолты.</p>
+          <p><strong>Безопасный импорт:</strong> При импорте бэкапа пользователь может загрузить поврежденный или несовместимый файл, что намертво сломает приложение.</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="c3-crit">
+        <div class="criticism-box">
+          <div class="criticism-title">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            Почему это сложно / опасное решение?
+          </div>
+          <p class="criticism-text">"Zod весит около 45-50 КБ в сжатом виде (gzip). Для PWA, где важен быстрый запуск (LCP < 1.2s), лишняя библиотека в основном бандле — это преступление. Нам придется импортировать Zod асинхронно или заменить его на легковесный рукописный валидатор типов, чтобы не раздувать билд."</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="c3-todo">
+        <ul class="todo-list">
+          <li class="todo-item">Описать Zod-схемы для Profile, Exercise, WorkoutSession и NutritionLog.</li>
+          <li class="todo-item">Интегрировать валидатор в метод `importBackup` в Zustand-сторе.</li>
+          <li class="todo-item">Настроить ленивую загрузку (dynamic import) валидатора только в момент импорта бэкапа.</li>
+        </ul>
+      </div>
+
+      <div class="metrics-bar">
+        <span>Сложность: <span class="metric-value">Средняя</span></span>
+        <span>Опасность: <span class="metric-value">Низкая</span></span>
+        <span>Сроки: <span class="metric-value">1 день</span></span>
+      </div>
+    </div>
+
+    <!-- КАРТОЧКА 4: ШАБЛОНЫ ПИТАНИЯ -->
+    <div class="card" data-priority="high" data-category="ux" style="--accent-color: var(--color-success);">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-meta">
+            <span class="badge badge-high">Высокий приоритет</span>
+            <span class="badge badge-ux">UX / Питание</span>
+          </div>
+          <h2>4. База быстрых продуктов и шаблоны еды</h2>
+        </div>
+      </div>
+      
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this, 'c4-what')">Суть задачи</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c4-why')">Зачем это нужно</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c4-crit')">Самокритика</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c4-todo')">Реализация</button>
+      </div>
+
+      <div class="tab-content active" id="c4-what">
+        <div class="text-block">
+          <p>Внедрение раздела «Мои продукты» во вкладку питания. Вместо ручного ввода калорий и БЖУ пользователь сможет создавать пресеты блюд (например: "Овсянка с бананом - 340 ккал, 10/6/60") и в один клик добавлять их в дневной лог.</p>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="c4-why">
+        <div class="text-block">
+          <p><strong>Снижение барьера ввода:</strong> Никто не будет ежедневно использовать трекер питания, если для записи каждого приема пищи нужно отдельно считать БЖУ на калькуляторе. Клик по готовому шаблону экономит 90% времени.</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="c4-crit">
+        <div class="criticism-box">
+          <div class="criticism-title">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            Почему это сложно / опасное решение?
+          </div>
+          <p class="criticism-text">"Полноценная база данных продуктов с поиском весит мегабайты и требует бэкенда. Так как Brosky Gym — строго клиентское автономное приложение, мы не можем встроить туда всю базу USDA. Наш удел — локальный список 'избранного', который пользователь наполняет сам. Это компромисс, который может разочаровать тех, кто привык к MyFitnessPal."</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="c4-todo">
+        <ul class="todo-list">
+          <li class="todo-item">Добавить в Zustand массив `customProducts` (id, name, kcal, protein, fat, carbs, defaultServing).</li>
+          <li class="todo-item">Создать UI-панель для создания и быстрого выбора продуктов во вкладке NutritionTab.</li>
+          <li class="todo-item">Реализовать расчет БЖУ пропорционально введенному весу порции (г).</li>
+        </ul>
+      </div>
+
+      <div class="metrics-bar">
+        <span>Сложность: <span class="metric-value">Низкая</span></span>
+        <span>Опасность: <span class="metric-value">Низкая</span></span>
+        <span>Сроки: <span class="metric-value">1.5 дня</span></span>
+      </div>
+    </div>
+
+    <!-- КАРТОЧКА 5: OFFLINE-FIRST -->
+    <div class="card" data-priority="medium" data-category="arch" style="--accent-color: var(--color-warning);">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-meta">
+            <span class="badge badge-medium">Средний приоритет</span>
+            <span class="badge badge-arch">Архитектура</span>
+          </div>
+          <h2>5. 100% Автономность (Локализация ассетов)</h2>
+        </div>
+      </div>
+      
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this, 'c5-what')">Суть задачи</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c5-why')">Зачем это нужно</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c5-crit')">Самокритика</button>
+        <button class="tab-btn" onclick="switchTab(this, 'c5-todo')">Реализация</button>
+      </div>
+
+      <div class="tab-content active" id="c5-what">
+        <div class="text-block">
+          <p>Скачивание и локальное хранение шрифтов (Google Fonts: Inter, Outfit, Montserrat) и пакетов иконок внутри репозитория проекта. Настройка Service Worker на их жесткое кэширование.</p>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="c5-why">
+        <div class="text-block">
+          <p><strong>Независимость от сети в подвалах:</strong> Тренажерные залы часто находятся в подвальных помещениях с толстыми железобетонными стенами, где мобильная связь и интернет отсутствуют. Приложение должно открываться мгновенно и выглядеть полноценно даже при полном офлайне.</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="c5-crit">
+        <div class="criticism-box">
+          <div class="criticism-title">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            Почему это сложно / опасное решение?
+          </div>
+          <p class="criticism-text">"Локализация шрифтов увеличит размер начальной загрузки билда на 150-200 КБ. Если пользователь открывает сайт впервые при плохом соединении, это увеличит время до первого интерактивного кадра (TTI). Мы должны оптимизировать шрифты, оставив только кириллицу и латиницу (subsetting)."</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="c5-todo">
+        <ul class="todo-list">
+          <li class="todo-item">Скачать файлы шрифтов Outfit и Inter (.woff2) и положить их в `app/public/fonts/`.</li>
+          <li class="todo-item">Заменить внешние ссылки `@import` в `index.css` на локальные `@font-face`.</li>
+          <li class="todo-item">Настроить `vite-plugin-pwa` на обязательное включение шрифтов в список прекэша PWA.</li>
+        </ul>
+      </div>
+
+      <div class="metrics-bar">
+        <span>Сложность: <span class="metric-value">Низкая</span></span>
+        <span>Опасность: <span class="metric-value">Низкая</span></span>
+        <span>Сроки: <span class="metric-value">4 часа</span></span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function switchTab(btn, contentId) {
+      const card = btn.closest('.card');
+      
+      // Деактивируем все кнопки в этой карточке
+      card.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      // Активируем текущую
+      btn.classList.add('active');
+      
+      // Скрываем весь контент в этой карточке
+      card.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      // Показываем нужный
+      card.querySelector('#' + contentId).classList.add('active');
+    }
+
+    function filterRoadmap(category) {
+      // Кнопки фильтров
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      
+      // Ищем кнопку по тексту или параметру и активируем её
+      event.target.classList.add('active');
+
+      const cards = document.querySelectorAll('.card');
+      
+      cards.forEach(card => {
+        if (category === 'all') {
+          card.style.display = 'block';
+        } else if (category === 'high' || category === 'medium') {
+          if (card.getAttribute('data-priority') === category) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        } else {
+          // По категории (arch / ux)
+          if (card.getAttribute('data-category') === category) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

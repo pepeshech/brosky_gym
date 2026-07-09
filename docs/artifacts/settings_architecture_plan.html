@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Математическое ядро — Brosky Gym</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gym-accent: #466bf7;
+      --gym-accent-glow: rgba(70, 107, 247, 0.15);
+      --gym-bg: #f4f6fa;
+      --gym-card: rgba(255, 255, 255, 0.7);
+      --gym-border: rgba(0, 0, 0, 0.06);
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+    }
+
+    body {
+      background-color: var(--gym-bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.5) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(243, 232, 255, 0.5) 0px, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 2.5rem;
+      margin: 0 0 10px 0;
+      letter-spacing: -0.03em;
+    }
+
+    h1 span {
+      color: var(--gym-accent);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    @media (min-width: 1024px) {
+      .grid {
+        grid-template-columns: 7fr 5fr;
+      }
+    }
+
+    .card {
+      background: var(--gym-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--gym-border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(70, 107, 247, 0.05);
+    }
+
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .icon-wrapper {
+      padding: 8px;
+      background: rgba(70, 107, 247, 0.1);
+      color: var(--gym-accent);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .formula-box {
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid var(--gym-border);
+      border-radius: 16px;
+      padding: 20px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.95rem;
+      color: #0f172a;
+      margin-bottom: 20px;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    .formula-tag {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: var(--gym-accent);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .math-title {
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    .math-desc {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* Инфографика баланса */
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 18px;
+      top: 36px;
+      width: 2px;
+      height: 20px;
+      background: var(--gym-border);
+    }
+
+    .flow-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: var(--gym-accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .flow-content {
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid var(--gym-border);
+      padding: 12px 16px;
+      border-radius: 14px;
+      flex-grow: 1;
+    }
+
+    .flow-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .flow-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gym-accent);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px var(--gym-accent-glow);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(70, 107, 247, 0.25);
+      background: #3558dd;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--text-main);
+      border: 1px solid var(--gym-border);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: #f8fafc;
+      box-shadow: none;
+      transform: translateY(-2px);
+    }
+
+    .action-bar {
+      margin-top: 32px;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .section-divider {
+      border-top: 1px dashed var(--gym-border);
+      margin: 24px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Brosky<span>Gym</span></h1>
+      <div class="subtitle">Как рассчитываются ваши калории и макросы</div>
+    </header>
+
+    <div class="grid">
+      <!-- Математическое Ядро -->
+      <div class="card">
+        <h2>
+          <div class="icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+              <path d="M6 6h10M6 10h10"/>
+            </svg>
+          </div>
+          Научно-обоснованные расчеты
+        </h2>
+
+        <div>
+          <!-- BMR -->
+          <div class="math-title">1. Базовый обмен веществ (BMR)</div>
+          <div class="math-desc">
+            Энергия, которую организм тратит в покое на дыхание и поддержание жизни. Рассчитывается как среднее из двух авторитетных формул:
+            <ul>
+              <li><strong>Mifflin-St Jeor</strong> — учитывает ваш вес, рост и возраст.</li>
+              <li><strong>Katch-McArdle</strong> — учитывает сухую мышечную массу (ЧМТ). Это защищает формулу от ошибок при разном проценте жира.</li>
+            </ul>
+          </div>
+          <div class="formula-box">
+            <span class="formula-tag">BMR</span>
+            • <strong>Миффлин:</strong> 9.99 × Вес + 6.25 × Рост - 4.92 × Возраст + (5 для мужчин / -161 для женщин)<br>
+            • <strong>ЧМТ (Чистая масса тела):</strong> Вес × (100 - % Жира) / 100<br>
+            • <strong>Кэтч-МакАрдл:</strong> 370 + 21.6 × ЧМТ<br>
+            • <strong>Итоговый BMR:</strong> Среднее арифметическое двух формул
+          </div>
+
+          <!-- TDEE -->
+          <div class="math-title">2. Суточный расход калорий (TDEE)</div>
+          <div class="math-desc">
+            Полный расход калорий за день с учетом всей вашей активности:
+          </div>
+          <div class="formula-box">
+            <span class="formula-tag">TDEE</span>
+            TDEE = Базовый обмен × Множитель активности + Шаги + Тренировки + Усвоение пищи<br><br>
+            • <strong>Шаги:</strong> Каждые 1000 шагов сжигают примерно 0.57 ккал на кг вашего веса.<br>
+            • <strong>Тренировки:</strong> Силовая тренировка добавляет базовые 390 ккал либо рассчитывается динамически по суммарному тоннажу поднятого веса.
+          </div>
+
+          <!-- БЖУ -->
+          <div class="math-title">3. Белки, Жиры и Углеводы</div>
+          <div class="math-desc">
+            Распределение нутриентов адаптировано под вашу цель (набор, сушка, рекомпозиция):
+          </div>
+          <div class="formula-box">
+            <span class="formula-tag">БЖУ</span>
+            • <strong>Белки:</strong> 2.0 г на кг веса (в день тренировки) / 1.8 г (в день отдыха). На сушке белок увеличивается до 2.5 г / 2.4 г для защиты мышц от распада.<br>
+            • <strong>Жиры:</strong> 1.0 г на кг для мужчин и 1.1 г для женщин (для поддержки гормональной системы).<br>
+            • <strong>Углеводы:</strong> Заполняют всю оставшуюся калорийность.
+          </div>
+        </div>
+      </div>
+
+      <!-- Потоки Данных -->
+      <div class="card">
+        <h2>
+          <div class="icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+          </div>
+          Инфографика расчета калорий
+        </h2>
+
+        <div class="flow-step">
+          <div class="flow-number">1</div>
+          <div class="flow-content">
+            <div class="flow-title">Ваш базовый метаболизм (BMR)</div>
+            <div class="flow-desc">Определяется вашими параметрами тела и процентом жира.</div>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-number">2</div>
+          <div class="flow-content">
+            <div class="flow-title">Добавляем шаги и тренировки</div>
+            <div class="flow-desc">Шаги с телефона и объем тренировок увеличивают расход энергии.</div>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-number">3</div>
+          <div class="flow-content">
+            <div class="flow-title">Применяем цель (Дефицит / Профицит)</div>
+            <div class="flow-desc">Для сушки вычитаем калории, для набора — добавляем. Получаем целевую калорийность.</div>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-number">4</div>
+          <div class="flow-content">
+            <div class="flow-title">Распределяем на макросы</div>
+            <div class="flow-desc">Рассчитываем белки и жиры под ваш вес, остаток отдаем под углеводы.</div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Симулятор изменения тела -->
+        <h2>
+          <div class="icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+          </div>
+          Симулятор изменения формы
+        </h2>
+        <div class="math-desc">
+          В новой версии настроек появится интерактивный симулятор. Вы сможете указать гипотетический вес и активность, чтобы заранее спланировать целевой рацион и увидеть, какими станут ваши нормы БЖУ при достижении желаемой формы.
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <a href="file:///E:/code/brosky_gym/app/src/components/SettingsTab.tsx" class="btn btn-secondary">Открыть SettingsTab.tsx</a>
+    </div>
+  </div>
+</body>
+</html>
