@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useGymStore } from '../../store/gymStore';
 import { Sparkles, Activity, Info, Zap, Shield, Flame, Check, RefreshCw, Layers } from '../BroskyIcon';
 import { calculateAutoPilotRecommendation } from '../../utils/autoPilotEngine';
@@ -8,7 +8,9 @@ export const AutoPilotConfigPanel: React.FC = () => {
   const workoutSessions = useGymStore((s) => s.workoutSessions);
   const updateProfile = useGymStore((s) => s.updateProfile);
 
-  const [hasPromptApi, setHasPromptApi] = useState<boolean>(false);
+  const [hasPromptApi] = useState<boolean>(() => {
+    return typeof window !== 'undefined' && 'ai' in window && !!(window as unknown as { ai?: { languageModel?: unknown } }).ai?.languageModel;
+  });
   const [testResult, setTestResult] = useState<{
     engine: string;
     exercise: string;
@@ -19,11 +21,6 @@ export const AutoPilotConfigPanel: React.FC = () => {
     protectionActive: boolean;
   } | null>(null);
   const [isTesting, setIsTesting] = useState<boolean>(false);
-
-  useEffect(() => {
-    const apiAvailable = typeof window !== 'undefined' && 'ai' in window && !!(window as unknown as { ai?: { languageModel?: unknown } }).ai?.languageModel;
-    setHasPromptApi(apiAvailable);
-  }, []);
 
   const isEnabled = profile.autoPilotEnabled ?? true;
   const aggressiveness = profile.autoPilotAggressiveness || 'balanced';
