@@ -53,3 +53,4 @@ _GEMINI.md
 .veai/
 .impeccable/
 *.tmp
+.github/workflows/deploy.yml
