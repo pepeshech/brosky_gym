@@ -319,8 +319,8 @@ export const LexiconPanel: React.FC = () => {
                   className="w-full p-4 text-left cursor-pointer flex items-center justify-between gap-3 btn-interactive"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-gym-accent/10 border border-gym-accent/20 flex items-center justify-center shrink-0">
-                      <span className="font-extrabold text-xs font-mono text-gym-accent">
+                    <div className="min-w-[40px] h-10 px-2.5 rounded-xl bg-gym-accent/10 border border-gym-accent/20 flex items-center justify-center shrink-0">
+                      <span className="font-extrabold text-xs font-mono text-gym-accent whitespace-nowrap">
                         {item.term}
                       </span>
                     </div>
