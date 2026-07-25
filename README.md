@@ -1,5 +1,12 @@
 # Brosky Gym Tracker Pro 🏋️‍♂️💪
 
+[![Deploy to GitHub Pages](https://github.com/pepeshech/brosky_gym/actions/workflows/gh-pages.yml/badge.svg)](https://pepeshech.github.io/brosky_gym/)
+[![CI Code Quality](https://github.com/pepeshech/brosky_gym/actions/workflows/ci.yml/badge.svg)](https://github.com/pepeshech/brosky_gym/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/pepeshech/brosky_gym?color=green)](https://github.com/pepeshech/brosky_gym/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PWA Local-First](https://img.shields.io/badge/PWA-Local--First-purple.svg)](https://pepeshech.github.io/brosky_gym/)
+[![Telegram](https://img.shields.io/badge/Telegram-@pepeshetf-2CA5E0?logo=telegram&logoColor=white)](https://t.me/pepeshetf)
+
 > **Научно-обоснованный спортивный трекер тренировок и КБЖУ с локальной авторегуляцией нагрузки, динамической моделью TDEE и встроенным спортивным глоссарием.**
 
 ---
