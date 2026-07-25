@@ -1,5 +1,19 @@
 {
-  "dependencies": {
-    "localtunnel": "^2.0.2"
+  "name": "brosky-gym-root",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "typecheck": "npm run --prefix app typecheck",
+    "test": "npm run --prefix app test"
+  },
+  "lint-staged": {
+    "app/src/**/*.{ts,tsx}": [
+      "npm run typecheck",
+      "npm run test"
+    ]
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.2.0"
   }
 }
