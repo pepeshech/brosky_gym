@@ -1,0 +1,821 @@
+@import "tailwindcss";
+
+/* Outfit Variable Font (Supports weights 100-900) */
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/outfit-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/outfit-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Plus Jakarta Sans Variable Font (Supports weights 200-800) */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116, U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+/* CSS Variables generated from Kigen.design */
+:root {
+  color-scheme: light;
+  --persian-blue-50: #eff1ff;
+  --persian-blue-100: #d7dbfd;
+  --persian-blue-200: #b3bcfc;
+  --persian-blue-300: #909ffb;
+  --persian-blue-400: #6e84f9;
+  --persian-blue-500: #466bf7;
+  --persian-blue-600: #2555df;
+  --persian-blue-700: #214cca;
+  --persian-blue-800: #1b40ad;
+  --persian-blue-900: #14338c;
+  --persian-blue-1000: #102c7b;
+  --persian-blue-1100: #0c246a;
+  --persian-blue-1200: #081d59;
+  --persian-blue-1300: #061548;
+  --persian-blue-1400: #030e35;
+}
+
+@theme {
+  --color-gym-bg: #f4f6fa;
+  --color-gym-surface: rgba(255, 255, 255, 0.45);
+  --color-gym-card: rgba(255, 255, 255, 0.65);
+  --color-gym-border: rgba(0, 0, 0, 0.06);
+  --color-gym-accent: var(--persian-blue-500); /* iOS Premium Blue updated to Persian Blue */
+
+  /* Переопределение стандартных цветов blue для консистентности */
+  --color-blue-50: var(--persian-blue-50);
+  --color-blue-100: var(--persian-blue-100);
+  --color-blue-200: var(--persian-blue-200);
+  --color-blue-300: var(--persian-blue-300);
+  --color-blue-400: var(--persian-blue-400);
+  --color-blue-500: var(--persian-blue-500);
+  --color-blue-600: var(--persian-blue-600);
+  --color-blue-700: var(--persian-blue-700);
+  --color-blue-800: var(--persian-blue-800);
+  --color-blue-900: var(--persian-blue-900);
+
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  --font-mono: "SF Mono", "JetBrains Mono", monospace;
+
+  /* Custom breakpoints */
+  --breakpoint-xs: 480px;
+}
+
+body {
+  background-color: #f4f6fa;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.5) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(243, 232, 255, 0.5) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(219, 234, 254, 0.4) 0px, transparent 50%);
+  color: #1f2937;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6, .brand-title {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+}
+
+/* Liquid Glass Panels - iOS Style */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(20px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.02),
+    0 8px 32px 0 rgba(31, 38, 135, 0.04) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(10px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(130%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    0 4px 16px 0 rgba(0, 0, 0, 0.02) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Мягкие ховеры для карточек с акцентным Persian Blue свечением */
+.glass-card:hover {
+  transform: translateY(-2.5px);
+  box-shadow: 
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.6),
+    0 12px 28px 0 rgba(70, 107, 247, 0.07) !important;
+  border-color: rgba(70, 107, 247, 0.22) !important;
+}
+
+/* Эффект нажатия кнопок (spring scale) */
+button, select {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Предотвращаем авто-зум iOS Safari при фокусе на input (font-size < 16px) */
+input, textarea, select {
+  font-size: max(16px, 1em);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* Интерактивные премиальные кнопки (Spring + Hover Scale) */
+.btn-interactive {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-interactive:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 22px rgba(70, 107, 247, 0.24) !important;
+}
+
+.btn-interactive:active {
+  transform: translateY(-0.5px) scale(0.96) !important;
+}
+
+.btn-interactive svg {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-interactive:hover svg {
+  transform: rotate(15deg) scale(1.12);
+}
+
+/* Навигационные кнопки переключения дат (сдвиг стрелок вбок вместо поворота) */
+.btn-interactive-nav-left svg,
+.btn-interactive-nav-right svg {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-interactive-nav-left:hover svg {
+  transform: translateX(-3px) scale(1.1) !important;
+}
+
+.btn-interactive-nav-right:hover svg {
+  transform: translateX(3px) scale(1.1) !important;
+}
+
+/* Кнопка вызова календаря (приподнимание иконки вверх без поворота) */
+.btn-interactive-calendar svg {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-interactive-calendar:hover svg {
+  transform: translateY(-2.5px) scale(1.15) !important;
+}
+
+/* Кнопка с эффектом бесконечного вращения на ховере */
+.btn-spin-hover svg {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-spin-hover:hover svg {
+  transform: rotate(180deg) scale(1.08);
+}
+
+/* Анимированный лоадер-градиент */
+@keyframes spin-gradient {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loader-gradient {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(70, 107, 247, 0.12);
+  border-top-color: var(--persian-blue-500);
+  border-radius: 50%;
+  animation: spin-gradient 0.8s linear infinite;
+}
+
+/* Анимация плавного появления страниц (iOS Premium Smooth Ease-Out) */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Снижаем blur glass-panel на мобиле для GPU performance */
+@media (max-width: 768px) {
+  .glass-panel {
+    backdrop-filter: blur(8px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(150%) !important;
+  }
+  .glass-card {
+    backdrop-filter: blur(6px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(6px) saturate(120%) !important;
+  }
+}
+
+/* Стилизация скроллбара */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Анимации для модальных окон подтверждения */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.animate-scaleUp {
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 3D Flip Utility Classes */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* SVG Ring Dashboard Classes */
+.svg-ring-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.svg-ring-container circle {
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease-out;
+}
+.svg-ring-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Точное центрирование по осям */
+  text-align: center;
+  width: 90px;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.center-val {
+  font-family: var(--font-display);
+  font-size: 1.1rem; /* Уменьшено для гарантированного размещения внутри кольца */
+  font-weight: 800;
+  letter-spacing: -0.02em; /* Плотные стильные цифры */
+  line-height: 0.95;
+}
+.center-label {
+  font-size: 0.44rem; /* Микро-шрифт для максимальной аккуратности */
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-top: 0.18rem; /* Аккуратный отступ */
+  line-height: 1.15;
+  max-width: 72px; /* Чуть уже, чтобы гарантированно не задевать кольцо r=56 */
+}
+.kbju-summary-front {
+  width: 100%;
+}
+.kbju-title-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #1f2937;
+}
+.kbju-chips-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+.kbju-chip {
+  flex: 1;
+  padding: 0.4rem 0.25rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.02);
+}
+.plan-section-title {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(70, 107, 247, 0.15);
+  padding-bottom: 0.25rem;
+}
+
+/* Micro rings Glow and Success checkmarks */
+.glow-active-wrapper {
+  position: relative;
+}
+
+.glow-active-wrapper.success::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #10b981;
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 900;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  animation: popCheck 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popCheck {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+
+/* --- Glass Showcase & Sliders Onboarding Redesign (Concept 5: Hybrid 1+3) --- */
+.glass-showcase {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(70, 107, 247, 0.15);
+  border-radius: 30px;
+  padding: 40px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.glass-header h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.8rem;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+}
+.glass-header p {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 6px;
+}
+
+.glass-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.glass-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #466bf7;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.glass-input-wrapper {
+  position: relative;
+}
+.glass-input-wrapper svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  transition: color 0.3s;
+}
+.glass-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(70, 107, 247, 0.15);
+  border-radius: 14px;
+  padding: 12px 14px 12px 42px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #0f172a;
+  transition: all 0.3s ease;
+}
+.glass-input:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: var(--color-gym-accent);
+  box-shadow: 0 0 12px rgba(70, 107, 247, 0.15);
+}
+.glass-input:focus + svg {
+  color: var(--color-gym-accent);
+}
+
+/* Gender Switcher */
+.glass-gender-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.glass-gender-btn {
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(70, 107, 247, 0.1);
+  border-radius: 14px;
+  padding: 12px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glass-gender-btn:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(70, 107, 247, 0.2);
+}
+.glass-gender-btn.active {
+  background: rgba(70, 107, 247, 0.08);
+  border-color: var(--color-gym-accent);
+  color: var(--color-gym-accent);
+  box-shadow: inset 0 2px 4px rgba(70, 107, 247, 0.05);
+}
+
+/* Goals Grid */
+.glass-goals-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 480px) {
+  .glass-goals-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.glass-goal-card {
+  background: #ffffff;
+  border: 2px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+.glass-goal-card:hover {
+  background: #fafafc;
+  border-color: rgba(70, 107, 247, 0.2);
+  transform: translateY(-1px);
+}
+.glass-goal-card .goal-badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+.glass-goal-card .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ccc;
+  transition: background-color 0.3s ease;
+}
+.glass-goal-card .goal-name {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  transition: color 0.3s ease;
+}
+.glass-goal-card .goal-desc {
+  font-size: 0.65rem;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+/* Active Goals in Liquid Glass */
+.glass-goal-card.active[data-goal="recomp"] { border-color: var(--color-recomp); background: rgba(168, 85, 247, 0.04); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.1); }
+.glass-goal-card.active[data-goal="recomp"] .dot { background: var(--color-recomp); }
+.glass-goal-card.active[data-goal="recomp"] .goal-name { color: var(--color-recomp); }
+
+.glass-goal-card.active[data-goal="maintenance"] { border-color: var(--color-maintenance); background: rgba(70, 107, 247, 0.04); box-shadow: 0 4px 15px rgba(70, 107, 247, 0.1); }
+.glass-goal-card.active[data-goal="maintenance"] .dot { background: var(--color-maintenance); }
+.glass-goal-card.active[data-goal="maintenance"] .goal-name { color: var(--color-maintenance); }
+
+.glass-goal-card.active[data-goal="bulk"] { border-color: var(--color-bulk); background: rgba(16, 185, 129, 0.04); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1); }
+.glass-goal-card.active[data-goal="bulk"] .dot { background: var(--color-bulk); }
+.glass-goal-card.active[data-goal="bulk"] .goal-name { color: var(--color-bulk); }
+
+.glass-goal-card.active[data-goal="cut"] { border-color: var(--color-cut); background: rgba(244, 63, 94, 0.04); box-shadow: 0 4px 15px rgba(244, 63, 94, 0.1); }
+.glass-goal-card.active[data-goal="cut"] .dot { background: var(--color-cut); }
+.glass-goal-card.active[data-goal="cut"] .goal-name { color: var(--color-cut); }
+
+/* Range Sliders */
+.slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.slider-row:last-child {
+  margin-bottom: 0;
+}
+.slider-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slider-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.slider-value {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-gym-accent);
+}
+.tiles-range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(70, 107, 247, 0.12);
+  outline: none;
+  cursor: pointer;
+}
+.tiles-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--color-gym-accent);
+  box-shadow: 0 2px 6px rgba(70, 107, 247, 0.3);
+  transition: transform 0.1s;
+}
+.tiles-range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+}
+
+.btn-submit {
+  width: 100%;
+  background: var(--color-gym-accent);
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 16px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 6px 20px rgba(70, 107, 247, 0.25);
+}
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(70, 107, 247, 0.35);
+  background: var(--persian-blue-600);
+}
+.btn-submit:active {
+  transform: scale(0.98) translateY(0);
+}
+
+/* =============================================
+   АДАПТИВНАЯ НИЖНЯЯ НАВИГАЦИЯ (Bottom Tab Bar)
+   Три уровня: icon-only → compact → full
+   ============================================= */
+
+/* Базовые переменные нав-бара */
+.bottom-nav-bar {
+  --nav-icon-size: 24px;
+  --nav-label-size: 10px;
+  --nav-label-display: block;
+  --nav-btn-py: 8px;
+  --nav-btn-px: 6px;
+  --nav-btn-gap: 4px;
+}
+
+/* Очень узкий: < 360px — скрываем подписи, только иконки */
+@media (max-width: 359px) {
+  .bottom-nav-bar {
+    --nav-icon-size: 22px;
+    --nav-label-display: none;
+    --nav-btn-py: 10px;
+    --nav-btn-px: 4px;
+    --nav-btn-gap: 0px;
+  }
+}
+
+/* Стандартный мобиль: 360–479px */
+@media (min-width: 360px) and (max-width: 479px) {
+  .bottom-nav-bar {
+    --nav-icon-size: 20px;
+    --nav-label-size: 9px;
+    --nav-btn-py: 7px;
+    --nav-btn-px: 4px;
+    --nav-btn-gap: 3px;
+  }
+}
+
+/* Широкий мобиль / мини-планшет: 480–767px */
+@media (min-width: 480px) and (max-width: 767px) {
+  .bottom-nav-bar {
+    --nav-icon-size: 22px;
+    --nav-label-size: 11px;
+    --nav-btn-py: 8px;
+    --nav-btn-px: 10px;
+    --nav-btn-gap: 5px;
+  }
+}
+
+/* Стили самих кнопок через переменные */
+.bottom-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--nav-btn-gap);
+  padding: var(--nav-btn-py) var(--nav-btn-px);
+  min-width: 0;
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: none;
+  background: transparent;
+  position: relative;
+}
+
+.bottom-nav-btn .nav-icon {
+  width: var(--nav-icon-size);
+  height: var(--nav-icon-size);
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bottom-nav-btn .nav-label {
+  display: var(--nav-label-display);
+  font-size: var(--nav-label-size);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  transition: font-size 0.2s ease;
+}
+
+/* Активное состояние */
+.bottom-nav-btn.nav-active {
+  color: var(--persian-blue-500);
+}
+
+.bottom-nav-btn.nav-active .nav-icon {
+  transform: translateY(-1px) scale(1.08);
+  filter: drop-shadow(0 2px 6px rgba(70, 107, 247, 0.35));
+}
+
+.bottom-nav-btn.nav-active .nav-label {
+  font-weight: 800;
+}
+
+/* Неактивное */
+.bottom-nav-btn:not(.nav-active) {
+  color: #9ca3af;
+}
+
+.bottom-nav-btn:not(.nav-active):hover {
+  color: #374151;
+}
+
+.bottom-nav-btn:active {
+  transform: scale(0.9);
+}
+
+/* Активная пилюля-индикатор (точка сверху) */
+.bottom-nav-btn.nav-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) scaleX(1);
+  transform-origin: center;
+  width: 20px;
+  height: 3px;
+  background: var(--persian-blue-500);
+  border-radius: 0 0 4px 4px;
+  animation: navIndicator 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes navIndicator {
+  0% { transform: translateX(-50%) scaleX(0); opacity: 0; }
+  100% { transform: translateX(-50%) scaleX(1); opacity: 1; }
+}
+
+/* Умная гидратация — пульсирующий бейдж +600 мл (день тренировки) */
+@keyframes pulseSublte {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSublte 2.4s ease-in-out infinite;
+}
+

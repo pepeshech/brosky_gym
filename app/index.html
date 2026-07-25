@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/gym-logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Brosky Gym" />
+    <meta name="theme-color" content="#f4f6fa" />
+    
+    <title>Brosky Gym Tracker</title>
+    
+    <!-- Critical Fonts Preload -->
+    <link rel="preload" href="%BASE_URL%fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="%BASE_URL%fonts/plus-jakarta-sans-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="%BASE_URL%fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="%BASE_URL%fonts/outfit-latin-ext.woff2" as="font" type="font/woff2" crossorigin />
+    
+    <style>
+      body {
+        background-color: #f4f6fa;
+        margin: 0;
+        font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+      .initial-skeleton {
+        animation: initial-pulse 1.6s infinite ease-in-out;
+        padding: 24px;
+        max-width: 1280px;
+        margin: 0 auto;
+        box-sizing: border-box;
+      }
+      .initial-header {
+        height: 64px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 20px;
+        margin-bottom: 32px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        box-sizing: border-box;
+      }
+      .initial-logo {
+        width: 130px;
+        height: 24px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+      }
+      .initial-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      @media (min-width: 1024px) {
+        .initial-grid {
+          grid-template-columns: 7fr 5fr;
+          gap: 32px;
+        }
+      }
+      .initial-card {
+        background: rgba(255, 255, 255, 0.35);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 24px;
+        margin-bottom: 24px;
+        box-sizing: border-box;
+      }
+      .card-large { height: 260px; }
+      .card-medium { height: 140px; }
+      .card-small { height: 128px; }
+      .card-right-1 { height: 310px; }
+      .card-right-2 { height: 160px; }
+      .initial-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      @keyframes initial-pulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 0.85; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="initial-skeleton">
+        <div class="initial-header">
+          <div class="initial-logo"></div>
+        </div>
+        <div class="initial-grid">
+          <div>
+            <div class="initial-card card-large"></div>
+            <div class="initial-row">
+              <div class="initial-card card-small" style="margin-bottom: 0;"></div>
+              <div class="initial-card card-small" style="margin-bottom: 0;"></div>
+            </div>
+            <div class="initial-card card-medium"></div>
+          </div>
+          <div>
+            <div class="initial-card card-right-1"></div>
+            <div class="initial-card card-right-2"></div>
+          </div>
+        </div>
+      </div>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var r of regs) { r.update(); }
+        });
+      }
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

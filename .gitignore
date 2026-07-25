@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build and Output
+dist/
+dist-ssr/
+build/
+*.tsbuildinfo
+
+# IDE & Editor Configs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Logs and Debugging
+Logs/
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+trace.json
+
+# Environment and Secrets
+.env
+.env.local
+.env.*.local
+
+# Documentation & Wiki (Excluded from repo)
+wiki/
+docs/
+audit/
+screenshot_*.png
+
+# Local Cache & System Artifacts
+.*cache/
+.tasks/
+plan.md
+log.md
+.tempmediaStorage/
+.system_generated/
+MEMORY_BROSKY_GYM.md
+_GEMINI.md
+.agents/
+.gemini/
+.veai/
+.impeccable/
+*.tmp
