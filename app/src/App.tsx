@@ -82,7 +82,7 @@ function App() {
       <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
 
       <footer className="hidden md:block border-t border-gym-border/40 py-6 text-center text-xs text-gray-400 bg-white/10 backdrop-blur-sm">
-        <p>© 2026 Gym Tracker Pro. Все расчеты сверены и скорректированы по методикам ACSM, WHO и Helms 2014.</p>
+        <p>© 2026 Brosky Gym. Все расчеты сверены и скорректированы по методикам ACSM, WHO и Helms 2014.</p>
       </footer>
 
       <ReloadPrompt />

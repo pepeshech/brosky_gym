@@ -1,4 +1,4 @@
-# Brosky Gym Tracker Pro 🏋️‍♂️💪
+# Brosky Gym 🏋️‍♂️💪
 
 [![Deploy to GitHub Pages](https://github.com/pepeshech/brosky_gym/actions/workflows/gh-pages.yml/badge.svg)](https://pepeshech.github.io/brosky_gym/)
 [![CI Code Quality](https://github.com/pepeshech/brosky_gym/actions/workflows/ci.yml/badge.svg)](https://github.com/pepeshech/brosky_gym/actions/workflows/ci.yml)

@@ -1,5 +1,5 @@
 @echo off
-title Brosky Gym Tracker Pro
+title Brosky Gym
 cd /d "%~dp0app"
 
 set "BRAVE_EXE=C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"

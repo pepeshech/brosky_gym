@@ -36,7 +36,7 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//],
       },
       manifest: {
-        name: 'Brosky Gym Tracker Pro',
+        name: 'Brosky Gym',
         short_name: 'Brosky Gym',
         description: 'Профессиональный трекер тренировок и питания',
         theme_color: '#f4f6fa',
