@@ -472,48 +472,60 @@ export const HomeTab: React.FC = () => {
 
         {/* 3. Календарь тренировок */}
         <div 
-          className="glass-panel rounded-2xl p-6 shadow-xl space-y-4 animate-fadeInUp opacity-0"
+          className="glass-panel rounded-2xl p-4 sm:p-6 shadow-xl space-y-4 animate-fadeInUp opacity-0"
           style={{ animationDelay: '120ms' }}
         >
-          <div className="flex flex-wrap justify-between items-center gap-4 border-b border-gym-border/40 pb-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gym-border/40 pb-3">
             <div className="flex items-center gap-3">
-              <h3 className="text-lg font-semibold flex items-center gap-2 text-gym-accent">
-                <Dumbbell size={20} />
-                Календарь тренировок
-              </h3>
-              <span className="text-xs bg-gym-accent/10 text-gym-accent font-bold px-2.5 py-1 rounded-lg">
-                За неделю: {workoutsThisWeek}
-              </span>
+              <div className="p-2.5 bg-gym-accent/10 text-gym-accent rounded-xl flex items-center justify-center shrink-0">
+                <Dumbbell size={24} />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg sm:text-xl font-black text-gray-800 tracking-tight leading-tight">
+                    Календарь тренировок
+                  </h3>
+                </div>
+                <span className="text-[10px] font-extrabold text-gym-accent bg-gym-accent/10 px-2 py-0.5 rounded-md w-max mt-0.5">
+                  За неделю: {workoutsThisWeek}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center bg-white/50 border border-gym-border/60 rounded-xl shadow-xs h-9">
+            
+            {/* Переключатель месяца */}
+            <div className="flex items-center bg-white/80 border border-gym-border/60 rounded-xl shadow-xs h-10 select-none overflow-hidden shrink-0 self-stretch sm:self-auto justify-between sm:justify-start">
               <button 
+                type="button"
                 onClick={handlePrevMonth} 
-                className="h-9 w-9 flex items-center justify-center hover:bg-gray-150 transition-all cursor-pointer text-gray-500 rounded-l-xl border-r border-gym-border/30 btn-interactive"
+                className="h-10 w-10 flex items-center justify-center hover:bg-gray-100 transition-all cursor-pointer text-gray-600 border-r border-gym-border/30 active:scale-95"
+                title="Предыдущий месяц"
               >
-                <ChevronLeft size={14} />
+                <ChevronLeft size={16} />
               </button>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-gray-700 select-none h-9 justify-center min-w-[110px]">
-                <Calendar size={14} className="text-gym-accent" />
-                <span className="text-center">
+              <div className="flex items-center gap-1.5 px-3 text-xs font-extrabold text-gray-800 justify-center min-w-[125px] whitespace-nowrap">
+                <Calendar size={15} className="text-gym-accent shrink-0" />
+                <span>
                   {monthNames[month]} {year}
                 </span>
               </div>
               <button 
+                type="button"
                 onClick={handleNextMonth} 
-                className="h-9 w-9 flex items-center justify-center hover:bg-gray-150 transition-all cursor-pointer text-gray-500 rounded-r-xl border-l border-gym-border/30 btn-interactive"
+                className="h-10 w-10 flex items-center justify-center hover:bg-gray-100 transition-all cursor-pointer text-gray-600 border-l border-gym-border/30 active:scale-95"
+                title="Следующий месяц"
               >
-                <ChevronRight size={14} />
+                <ChevronRight size={16} />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-xs font-bold text-gray-400 mb-1">
+          <div className="grid grid-cols-7 gap-1.5 text-center text-[11px] font-black text-gray-400 uppercase tracking-wider mb-1">
             <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 sm:gap-2">
+          <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
             {Array.from({ length: firstDayIndex }).map((_, idx) => (
-              <div key={`empty-${idx}`} className="aspect-square h-auto min-h-[36px]"></div>
+              <div key={`empty-${idx}`} className="aspect-square h-auto min-h-[38px]"></div>
             ))}
 
             {Array.from({ length: daysInMonth }).map((_, idx) => {
@@ -525,26 +537,35 @@ export const HomeTab: React.FC = () => {
               return (
                 <button
                   key={dateStr}
+                  type="button"
                   onClick={() => handleDayClick(dateStr)}
-                  className={`aspect-square h-auto min-h-[36px] py-1 rounded-xl flex flex-col items-center justify-center relative transition-all cursor-pointer border text-xs font-semibold ${
+                  className={`aspect-square h-auto min-h-[38px] p-1 rounded-xl flex flex-col items-center justify-between transition-all cursor-pointer border text-xs font-bold leading-none select-none ${
                     hasWorkout 
-                      ? 'bg-gym-accent text-white border-gym-accent shadow-sm' 
-                      : 'bg-white/50 hover:bg-white text-gray-700 border-gym-border/40'
-                  } ${isToday ? 'ring-2 ring-emerald-500 ring-offset-1' : ''}`}
+                      ? 'bg-gym-accent text-white border-gym-accent shadow-sm hover:bg-gym-accent/90' 
+                      : 'bg-white/60 hover:bg-white text-gray-700 border-gym-border/40'
+                  } ${isToday ? 'ring-2 ring-emerald-500 ring-offset-1 z-10' : ''}`}
                 >
-                  <span>{dayNum}</span>
-                  {hasWorkout && (
-                    <span className="absolute bottom-1 w-1 h-1 bg-white rounded-full"></span>
+                  <span className="mt-1">{dayNum}</span>
+                  {hasWorkout ? (
+                    <span className="w-1.5 h-1.5 bg-white rounded-full mb-1 shrink-0"></span>
+                  ) : (
+                    <span className="w-1.5 h-1.5 opacity-0 mb-1"></span>
                   )}
                 </button>
               );
             })}
           </div>
           
-          <div className="text-[10px] text-gray-400 flex gap-4 pt-2 border-t border-gym-border/30">
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-gym-accent rounded-md inline-block"></span> Тренировка</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-white border border-gym-border/40 rounded-md inline-block"></span> День отдыха</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 border-2 border-emerald-500 rounded-md inline-block"></span> Сегодня</span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-3 border-t border-gym-border/30 text-xs font-semibold text-gray-500">
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 bg-gym-accent rounded-md inline-block shadow-xs"></span> Тренировка
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 bg-white border border-gym-border/60 rounded-md inline-block"></span> День отдыха
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 border-2 border-emerald-500 rounded-md inline-block"></span> Сегодня
+            </span>
           </div>
         </div>
       </div>
