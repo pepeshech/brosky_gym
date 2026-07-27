@@ -125,46 +125,46 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
               )}
             </div>
 
-            <div className="grid grid-cols-4 gap-2.5">
+            <div className="grid grid-cols-4 gap-2">
               {/* Калории (Rose) */}
-              <div className="p-3 bg-rose-50/70 border border-rose-150/70 rounded-2xl text-center shadow-xs">
-                <span className="text-[10px] font-extrabold text-rose-500 uppercase tracking-wider block mb-0.5">
+              <div className="p-2 sm:p-3 bg-rose-50/70 border border-rose-150/70 rounded-2xl text-center shadow-xs">
+                <span className="text-[9px] sm:text-[10px] font-extrabold text-rose-500 uppercase tracking-wider block mb-0.5">
                   Калории
                 </span>
-                <span className="text-lg font-black font-display text-rose-600 leading-tight">
+                <span className="text-base sm:text-lg font-black font-display text-rose-600 leading-tight tracking-tight block">
                   {deficit.calories}
                 </span>
                 <span className="text-[9px] font-bold text-rose-400 block">ккал</span>
               </div>
 
               {/* Белки (Orange) */}
-              <div className="p-3 bg-orange-50/70 border border-orange-150/70 rounded-2xl text-center shadow-xs">
-                <span className="text-[10px] font-extrabold text-orange-500 uppercase tracking-wider block mb-0.5">
+              <div className="p-2 sm:p-3 bg-orange-50/70 border border-orange-150/70 rounded-2xl text-center shadow-xs">
+                <span className="text-[9px] sm:text-[10px] font-extrabold text-orange-500 uppercase tracking-wider block mb-0.5">
                   Белки
                 </span>
-                <span className="text-lg font-black font-display text-orange-600 leading-tight">
+                <span className="text-base sm:text-lg font-black font-display text-orange-600 leading-tight tracking-tight block">
                   {deficit.protein}
                 </span>
                 <span className="text-[9px] font-bold text-orange-400 block">грамм</span>
               </div>
 
               {/* Жиры (Yellow/Amber) */}
-              <div className="p-3 bg-yellow-50/70 border border-yellow-150/70 rounded-2xl text-center shadow-xs">
-                <span className="text-[10px] font-extrabold text-yellow-600 uppercase tracking-wider block mb-0.5">
+              <div className="p-2 sm:p-3 bg-yellow-50/70 border border-yellow-150/70 rounded-2xl text-center shadow-xs">
+                <span className="text-[9px] sm:text-[10px] font-extrabold text-yellow-600 uppercase tracking-wider block mb-0.5">
                   Жиры
                 </span>
-                <span className="text-lg font-black font-display text-yellow-600 leading-tight">
+                <span className="text-base sm:text-lg font-black font-display text-yellow-600 leading-tight tracking-tight block">
                   {deficit.fat}
                 </span>
                 <span className="text-[9px] font-bold text-yellow-500 block">грамм</span>
               </div>
 
               {/* Углеводы (Cyan) */}
-              <div className="p-3 bg-cyan-50/70 border border-cyan-150/70 rounded-2xl text-center shadow-xs">
-                <span className="text-[10px] font-extrabold text-cyan-600 uppercase tracking-wider block mb-0.5">
+              <div className="p-2 sm:p-3 bg-cyan-50/70 border border-cyan-150/70 rounded-2xl text-center shadow-xs">
+                <span className="text-[9px] sm:text-[10px] font-extrabold text-cyan-600 uppercase tracking-wider block mb-0.5 truncate">
                   Углеводы
                 </span>
-                <span className="text-lg font-black font-display text-cyan-600 leading-tight">
+                <span className="text-base sm:text-lg font-black font-display text-cyan-600 leading-tight tracking-tight block">
                   {deficit.carbs}
                 </span>
                 <span className="text-[9px] font-bold text-cyan-500 block">грамм</span>
