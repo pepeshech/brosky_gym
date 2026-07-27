@@ -33,24 +33,31 @@ export const SettingsTab: React.FC = () => {
   const workoutTemplates = useGymStore(s => s.workoutTemplates);
   const personalRecords = useGymStore(s => s.personalRecords);
 
+  const safeGoal = (profile && profile.selectedGoal && profile.selectedGoal in GOAL_STEPS) ? profile.selectedGoal : 'maintenance';
+  const safeWeight = profile?.weight || 70;
+  const safeFat = profile?.fatPercent || 15;
+  const safeHeight = profile?.height || 175;
+  const safeAge = profile?.age || 25;
+  const safeGender = profile?.gender || 'male';
+
   // Состояние интерактивного симулятора
-  const [simWeight, setSimWeight] = useState<number>(profile.weight);
-  const [simFat, setSimFat] = useState<number>(profile.fatPercent);
-  const [simSteps, setSimSteps] = useState<number>(GOAL_STEPS[profile.selectedGoal]);
-  const [simGoal, setSimGoal] = useState<'recomp' | 'maintenance' | 'bulk' | 'cut'>(profile.selectedGoal);
+  const [simWeight, setSimWeight] = useState<number>(safeWeight);
+  const [simFat, setSimFat] = useState<number>(safeFat);
+  const [simSteps, setSimSteps] = useState<number>(GOAL_STEPS[safeGoal] || 9000);
+  const [simGoal, setSimGoal] = useState<'recomp' | 'maintenance' | 'bulk' | 'cut'>(safeGoal);
   const [simIsWorkout, setSimIsWorkout] = useState<boolean>(true);
 
   // Подсчет BMR и TDEE на основе текущего профиля для справочного раздела
-  const currentLbm = useMemo(() => calculateLBM(profile.weight, profile.fatPercent), [profile.weight, profile.fatPercent]);
-  const currentBmrMifflin = useMemo(() => calculateBMR_Mifflin(profile.weight, profile.height, profile.age, profile.gender), [profile.weight, profile.height, profile.age, profile.gender]);
+  const currentLbm = useMemo(() => calculateLBM(safeWeight, safeFat), [safeWeight, safeFat]);
+  const currentBmrMifflin = useMemo(() => calculateBMR_Mifflin(safeWeight, safeHeight, safeAge, safeGender), [safeWeight, safeHeight, safeAge, safeGender]);
   const currentBmrKatch = useMemo(() => calculateBMR_Katch(currentLbm), [currentLbm]);
   const currentBmrAverage = useMemo(() => Math.round((currentBmrMifflin + currentBmrKatch) / 2), [currentBmrMifflin, currentBmrKatch]);
   
   // Адаптивный TDEE на основе истории замеров веса и лога калорий
   const adaptiveTdeeResult = useMemo(() => {
-    const staticTdee = Math.round((currentBmrAverage + calculateNEAT(GOAL_STEPS[profile.selectedGoal], profile.weight)) * 1.10);
-    return calculateAdaptiveTDEE(progress, nutritionLogs, staticTdee);
-  }, [progress, nutritionLogs, currentBmrAverage, profile.selectedGoal, profile.weight]);
+    const staticTdee = Math.round((currentBmrAverage + calculateNEAT(GOAL_STEPS[safeGoal] || 9000, safeWeight)) * 1.10);
+    return calculateAdaptiveTDEE(progress || [], nutritionLogs || [], staticTdee);
+  }, [progress, nutritionLogs, currentBmrAverage, safeGoal, safeWeight]);
 
   const simDietPlan = useMemo(() => {
     // Считаем БЖУ для симулятора (используем Ainsworth MET формулу для шагов)
@@ -162,12 +169,12 @@ export const SettingsTab: React.FC = () => {
               </p>
               <div className="bg-gray-100/70 p-3 sm:p-3.5 rounded-xl text-xs space-y-2 font-medium text-gray-700">
                 <div className="flex justify-between items-center gap-2 min-w-0">
-                  <span className="truncate">Шаги ({GOAL_STEPS[profile.selectedGoal]}):</span>
-                  <span className="font-bold text-gray-900 flex-shrink-0">+{Math.round(calculateNEAT(GOAL_STEPS[profile.selectedGoal], profile.weight))} ккал</span>
+                  <span className="truncate">Шаги ({GOAL_STEPS[safeGoal] || 9000}):</span>
+                  <span className="font-bold text-gray-900 flex-shrink-0">+{Math.round(calculateNEAT(GOAL_STEPS[safeGoal] || 9000, safeWeight))} ккал</span>
                 </div>
                 <div className="flex justify-between items-center gap-2 min-w-0">
                   <span className="truncate">Силовая тренировка:</span>
-                  <span className="font-bold text-gray-900 flex-shrink-0">+{Math.round(calculateEAT(profile.weight))} ккал</span>
+                  <span className="font-bold text-gray-900 flex-shrink-0">+{Math.round(calculateEAT(safeWeight))} ккал</span>
                 </div>
                 <p className="text-[10px] text-gray-400 mt-2 italic leading-normal border-t border-gym-border/40 pt-1.5">
                   * Энергорасход шагов автоматически масштабируется при изменении веса атлета.

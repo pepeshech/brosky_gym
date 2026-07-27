@@ -1541,8 +1541,6 @@ const ExercisesTab: React.FC = () => {
     setEditingId(null);
   };
 
-  const expandedEx = useMemo(() => exercises.find((e) => e.id === expandedId), [exercises, expandedId]);
-
   if (showForm) {
     return (
       <div className="space-y-5">
@@ -1659,17 +1657,40 @@ const ExercisesTab: React.FC = () => {
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       {/* Левая колонка - Анатомический атлас (всегда виден) */}
       <div className="lg:col-span-4 glass-panel rounded-2xl p-5 border border-gym-border/30 bg-white/40 shadow-sm lg:sticky lg:top-5">
-        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5 border-b border-gym-border pb-3">
-          <Muscle size={14} className="text-gym-accent" />
-          Интерактивный атлас мышц
-        </h3>
-        <AnatomyModel
-          activeMain={expandedEx ? expandedEx.muscleGroup : null}
-          activeSecondary={expandedEx ? (expandedEx.muscleGroups || []).filter(m => m !== expandedEx.muscleGroup) : []}
-          selectedFilter={filterGroup}
-          onSelectMuscle={(muscle) => setFilterGroup(muscle as string | null)}
-          mode="filter"
-        />
+        <div className="flex items-center justify-between border-b border-gym-border pb-3 mb-3">
+          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+            <Muscle size={14} className="text-gym-accent" />
+            Интерактивный атлас
+          </h3>
+          <div className="flex bg-slate-100 p-0.5 rounded-lg text-[10px] font-bold border border-slate-200">
+            <button
+              onClick={() => setFilterGroup(null)}
+              className={`px-2 py-0.5 rounded-md transition-all ${
+                !filterGroup ? 'bg-white text-slate-800 shadow-xs' : 'text-slate-500'
+              }`}
+            >
+              Все
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <AnatomyModel
+            selectedFilter={filterGroup}
+            onSelectMuscle={setFilterGroup}
+          />
+          {filterGroup && (
+            <div className="flex items-center justify-between p-2.5 bg-gym-accent/10 rounded-xl border border-gym-accent/20 text-xs">
+              <span className="font-semibold text-gym-accent">Фильтр: {filterGroup}</span>
+              <button
+                onClick={() => setFilterGroup(null)}
+                className="text-slate-400 hover:text-slate-700 font-bold underline"
+              >
+                Сбросить
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Правая колонка - Поиск и список упражнений */}

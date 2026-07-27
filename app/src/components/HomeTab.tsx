@@ -562,22 +562,22 @@ export const HomeTab: React.FC = () => {
             onClick={() => setAtlasMode('heatmap')}
             className={`flex-1 py-1.5 rounded-lg text-center transition-all cursor-pointer ${
               atlasMode === 'heatmap'
-                ? 'bg-white text-slate-800 shadow-xs'
+                ? 'bg-gym-accent text-white shadow-xs'
                 : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            Объем за 7 дней
+            Объем 7 дней
           </button>
           <button
             type="button"
             onClick={() => setAtlasMode('fatigue')}
             className={`flex-1 py-1.5 rounded-lg text-center transition-all cursor-pointer ${
               atlasMode === 'fatigue'
-                ? 'bg-white text-slate-800 shadow-xs'
+                ? 'bg-gym-accent text-white shadow-xs'
                 : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            Утомляемость мышц
+            Утомление
           </button>
         </div>
         

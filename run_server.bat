@@ -7,7 +7,6 @@ set "BRAVE_EXE=C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.ex
 :: Проверка: запущен ли уже сервер на порту 4173?
 netstat -o -n -a | findstr /R /C:":4173 .*LISTENING" >nul
 if %ERRORLEVEL% equ 0 (
-    :: Сервер уже работает — просто открываем вкладку браузера без создания второго процесса
     if exist "%BRAVE_EXE%" (
         start "" "%BRAVE_EXE%" "http://localhost:4173/"
     ) else (
@@ -16,7 +15,7 @@ if %ERRORLEVEL% equ 0 (
     exit /b 0
 )
 
-:: Если сервер ещё не запущен — открываем браузер через 1.5 сек и стартуем Vite Preview
-start /b cmd /c "timeout /t 2 /nobreak >nul & if exist "%BRAVE_EXE%" (start "" "%BRAVE_EXE%" "http://localhost:4173/") else (start "" "http://localhost:4173/")"
+:: Открываем браузер через 1 сек и запускаем сервер Vite Preview
+start /b cmd /c "timeout /t 1 /nobreak >nul & if exist "%BRAVE_EXE%" (start "" "%BRAVE_EXE%" "http://localhost:4173/") else (start "" "http://localhost:4173/")"
 
 npm run preview
