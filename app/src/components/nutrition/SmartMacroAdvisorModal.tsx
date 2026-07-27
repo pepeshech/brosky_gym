@@ -110,11 +110,11 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
         </div>
 
         {/* Content Body */}
-        <div className="p-6 overflow-y-auto space-y-5">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-5">
           
           {/* Остаток КБЖУ до цели */}
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-2.5">
               <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                 Остаток КБЖУ до цели
               </h4>
@@ -125,57 +125,58 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
               )}
             </div>
 
-            <div className="grid grid-cols-4 gap-2">
+            {/* 2x2 на мобильном, 4x1 на экранах от sm */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {/* Калории (Rose) */}
-              <div className="p-2 sm:p-3 bg-rose-50/70 border border-rose-150/70 rounded-2xl text-center shadow-xs">
-                <span className="text-[9px] sm:text-[10px] font-extrabold text-rose-500 uppercase tracking-wider block mb-0.5">
+              <div className="p-3 bg-rose-50/70 border border-rose-150/70 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
+                <span className="text-[10px] font-extrabold text-rose-500 uppercase tracking-wider block mb-0.5">
                   Калории
                 </span>
-                <span className="text-base sm:text-lg font-black font-display text-rose-600 leading-tight tracking-tight block">
+                <span className="text-lg sm:text-xl font-black font-display text-rose-600 leading-tight">
                   {deficit.calories}
                 </span>
-                <span className="text-[9px] font-bold text-rose-400 block">ккал</span>
+                <span className="text-[9px] font-bold text-rose-400 block mt-0.5">ккал</span>
               </div>
 
               {/* Белки (Orange) */}
-              <div className="p-2 sm:p-3 bg-orange-50/70 border border-orange-150/70 rounded-2xl text-center shadow-xs">
-                <span className="text-[9px] sm:text-[10px] font-extrabold text-orange-500 uppercase tracking-wider block mb-0.5">
+              <div className="p-3 bg-orange-50/70 border border-orange-150/70 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
+                <span className="text-[10px] font-extrabold text-orange-500 uppercase tracking-wider block mb-0.5">
                   Белки
                 </span>
-                <span className="text-base sm:text-lg font-black font-display text-orange-600 leading-tight tracking-tight block">
+                <span className="text-lg sm:text-xl font-black font-display text-orange-600 leading-tight">
                   {deficit.protein}
                 </span>
-                <span className="text-[9px] font-bold text-orange-400 block">грамм</span>
+                <span className="text-[9px] font-bold text-orange-400 block mt-0.5">грамм</span>
               </div>
 
               {/* Жиры (Yellow/Amber) */}
-              <div className="p-2 sm:p-3 bg-yellow-50/70 border border-yellow-150/70 rounded-2xl text-center shadow-xs">
-                <span className="text-[9px] sm:text-[10px] font-extrabold text-yellow-600 uppercase tracking-wider block mb-0.5">
+              <div className="p-3 bg-yellow-50/70 border border-yellow-150/70 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
+                <span className="text-[10px] font-extrabold text-yellow-600 uppercase tracking-wider block mb-0.5">
                   Жиры
                 </span>
-                <span className="text-base sm:text-lg font-black font-display text-yellow-600 leading-tight tracking-tight block">
+                <span className="text-lg sm:text-xl font-black font-display text-yellow-600 leading-tight">
                   {deficit.fat}
                 </span>
-                <span className="text-[9px] font-bold text-yellow-500 block">грамм</span>
+                <span className="text-[9px] font-bold text-yellow-500 block mt-0.5">грамм</span>
               </div>
 
               {/* Углеводы (Cyan) */}
-              <div className="p-2 sm:p-3 bg-cyan-50/70 border border-cyan-150/70 rounded-2xl text-center shadow-xs">
-                <span className="text-[9px] sm:text-[10px] font-extrabold text-cyan-600 uppercase tracking-wider block mb-0.5 truncate">
+              <div className="p-3 bg-cyan-50/70 border border-cyan-150/70 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
+                <span className="text-[10px] font-extrabold text-cyan-600 uppercase tracking-wider block mb-0.5">
                   Углеводы
                 </span>
-                <span className="text-base sm:text-lg font-black font-display text-cyan-600 leading-tight tracking-tight block">
+                <span className="text-lg sm:text-xl font-black font-display text-cyan-600 leading-tight">
                   {deficit.carbs}
                 </span>
-                <span className="text-[9px] font-bold text-cyan-500 block">грамм</span>
+                <span className="text-[9px] font-bold text-cyan-500 block mt-0.5">грамм</span>
               </div>
             </div>
           </div>
 
           {/* Advice Box */}
           <div className="p-4 bg-gym-accent/5 border border-gym-accent/15 rounded-2xl">
-            <div className="flex items-center gap-2 mb-1.5">
-              <Sparkles className="w-4 h-4 text-gym-accent" />
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-4 h-4 text-gym-accent shrink-0" />
               <span className="text-xs font-bold text-gym-accent uppercase tracking-wider">
                 Рекомендация нутрициолога
               </span>
@@ -196,7 +197,7 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
           {/* Recommended Portions List */}
           {!isLoading && recommendedItems.length > 0 && (
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-2.5">
                 <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                   Порционный расчет
                 </h4>
@@ -205,15 +206,15 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
                 </span>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {recommendedItems.map((item, idx) => (
                   <div
                     key={idx}
-                    className="p-3.5 bg-white/70 border border-gym-border/50 hover:border-gym-accent/40 rounded-2xl flex items-center justify-between shadow-xs transition-all"
+                    className="p-3.5 bg-white/80 border border-gym-border/50 hover:border-gym-accent/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs transition-all"
                   >
-                    <div className="space-y-1">
-                      <span className="font-bold text-sm text-gray-800 block">{item.name}</span>
-                      <div className="flex items-center gap-1.5">
+                    <div className="space-y-1.5 flex-1 min-w-0">
+                      <span className="font-bold text-sm text-gray-800 block truncate">{item.name}</span>
+                      <div className="flex flex-wrap items-center gap-1.5">
                         <span className="bg-orange-50 text-orange-600 border border-orange-200/60 px-2 py-0.5 rounded-md font-mono text-[11px] font-bold">
                           Б: {item.protein}г
                         </span>
@@ -226,11 +227,11 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
                       </div>
                     </div>
 
-                    <div className="text-right flex flex-col items-end">
-                      <span className="bg-gym-accent/10 text-gym-accent font-black font-display px-3 py-1 rounded-xl text-xs block">
+                    <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 border-gym-border/20 pt-2 sm:pt-0">
+                      <span className="bg-gym-accent/10 text-gym-accent font-black font-display px-3 py-1 rounded-xl text-xs">
                         {item.grams} г
                       </span>
-                      <span className="text-[11px] text-gray-400 font-medium mt-1">{item.calories} ккал</span>
+                      <span className="text-[11px] text-gray-400 font-medium sm:mt-1">{item.calories} ккал</span>
                     </div>
                   </div>
                 ))}
