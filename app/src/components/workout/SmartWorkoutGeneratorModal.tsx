@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { useGymStore } from '../../store/gymStore';
 import { MUSCLE_GROUPS, EQUIPMENT_TYPES, defaultExercises } from '../../store/staticData';
 import { generateSmartWorkoutTemplate, type GeneratedWorkoutResult } from '../../utils/workoutGenerator';
 import { X, Sparkles, Dumbbell, Check, Zap, Clock, Shield, ArrowRight, History } from '../BroskyIcon';
+import { ModalSpringPresets } from '../../utils/animationEngine';
 
 interface SmartWorkoutGeneratorModalProps {
   isOpen: boolean;
@@ -27,8 +29,6 @@ export const SmartWorkoutGeneratorModal: React.FC<SmartWorkoutGeneratorModalProp
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedResult, setGeneratedResult] = useState<GeneratedWorkoutResult | null>(null);
-
-  if (!isOpen) return null;
 
   const toggleMuscle = (m: string) => {
     setSelectedMuscles(prev =>
@@ -54,13 +54,14 @@ export const SmartWorkoutGeneratorModal: React.FC<SmartWorkoutGeneratorModalProp
     setIsGenerating(true);
     try {
       const res = await generateSmartWorkoutTemplate({
-        name: customName,
         goal,
         targetMuscles: selectedMuscles,
         equipment: selectedEquipment,
         durationMinutes: duration,
         experienceLevel: experience,
+        name: customName.trim() || undefined,
       });
+
       setGeneratedResult(res);
     } finally {
       setIsGenerating(false);
@@ -83,15 +84,26 @@ export const SmartWorkoutGeneratorModal: React.FC<SmartWorkoutGeneratorModalProp
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity" 
-        onClick={onClose} 
-      />
-
-      {/* Surface Panel - Fixed Flex Column Shell */}
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl border border-gray-100 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col max-h-[90vh] sm:max-h-[85vh] z-10 overflow-hidden">
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="smart-workout-backdrop"
+          initial={ModalSpringPresets.backdrop.initial}
+          animate={ModalSpringPresets.backdrop.animate}
+          exit={ModalSpringPresets.backdrop.exit}
+          transition={ModalSpringPresets.backdrop.transition}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 bg-gray-900/40 backdrop-blur-xs"
+          onClick={onClose}
+        >
+          <motion.div
+            key="smart-workout-container"
+            initial={ModalSpringPresets.container.initial}
+            animate={ModalSpringPresets.container.animate}
+            exit={ModalSpringPresets.container.exit}
+            transition={ModalSpringPresets.container.transition}
+            className="relative w-full max-w-2xl bg-white rounded-3xl border border-gray-100 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col max-h-[90vh] sm:max-h-[85vh] z-10 overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
         
         {/* Fixed Header */}
         <div className="px-5 py-4 sm:px-7 sm:py-5 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white/95 backdrop-blur-md">
@@ -397,9 +409,10 @@ export const SmartWorkoutGeneratorModal: React.FC<SmartWorkoutGeneratorModalProp
             </div>
           )}
         </div>
-
-      </div>
-    </div>,
-    document.body
-  );
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>,
+document.body
+);
 };

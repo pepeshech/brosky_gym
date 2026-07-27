@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useGymStore } from '../store/gymStore';
 import { calculateTDEE, generateDietPlans } from '../utils/formulas';
 import { Activity, Flame, Droplet, Dumbbell, Coffee, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Calendar, Footprints } from './BroskyIcon';
 import { AnatomyModel } from './AnatomyModel';
+import { animateCounter } from '../utils/animationEngine';
 
 const generateWorkoutId = () => 'workout-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
 
@@ -201,6 +202,14 @@ export const HomeTab: React.FC = () => {
     setCurrentDate(new Date(year, month - 1, 1));
   };
 
+  const calorieRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (calorieRef.current && todayPlan.calories > 0) {
+      animateCounter(calorieRef.current, todayPlan.calories, 0.8, 0);
+    }
+  }, [todayPlan.calories]);
+
   const handleNextMonth = () => {
     setCurrentDate(new Date(year, month + 1, 1));
   };
@@ -285,7 +294,7 @@ export const HomeTab: React.FC = () => {
                   />
                 </svg>
                 <div className="absolute flex flex-col items-center justify-center text-center">
-                  <span className="text-2xl font-black text-gray-800 font-display leading-none">{todayPlan.calories}</span>
+                  <span ref={calorieRef} className="text-2xl font-black text-gray-800 font-display leading-none">{todayPlan.calories}</span>
                   <span className="text-[9px] font-bold text-gray-400 mt-1 uppercase tracking-wider">ккал</span>
                 </div>
               </div>
