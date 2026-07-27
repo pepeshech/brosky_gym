@@ -246,25 +246,29 @@ export const HomeTab: React.FC = () => {
           className="glass-panel rounded-2xl p-6 shadow-xl border border-emerald-500/10 space-y-4 animate-fadeInUp opacity-0"
           style={{ animationDelay: '0ms' }}
         >
-          <div className="flex justify-between items-center border-b border-gym-border pb-3 mb-4">
-            <div>
-              <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                <Activity size={20} className="text-emerald-500" />
-                План питания и активности на сегодня
+          <div className="flex flex-col gap-2.5 sm:flex-row sm:justify-between sm:items-center border-b border-gym-border pb-3 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-emerald-500/10 text-emerald-600 rounded-xl flex items-center justify-center shrink-0">
+                <Activity size={24} />
+              </div>
+              <h3 className="text-lg sm:text-xl font-black text-gray-800 tracking-tight leading-tight">
+                План на сегодня
               </h3>
             </div>
-            <span className={`text-xs font-bold px-3 py-1 rounded-full font-mono uppercase tracking-wider ${
-              isTodayWorkout ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-200' : 'bg-blue-500/10 text-blue-600 border border-blue-200'
-            }`}>
-              {isTodayWorkout ? 'День тренировки' : 'День отдыха'}
-            </span>
+            <div className="self-start sm:self-auto">
+              <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-lg uppercase tracking-wider ${
+                isTodayWorkout ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-200/80' : 'bg-blue-500/10 text-blue-600 border border-blue-200/80'
+              }`}>
+                {isTodayWorkout ? 'День тренировки' : 'День отдыха'}
+              </span>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {/* Круг калорий */}
             <div className="flex flex-col items-center justify-center p-4 bg-white/40 border border-gym-border/30 rounded-2xl relative">
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Бюджет Калорий</span>
-              <div className="relative w-32 h-32 flex items-center justify-center">
+              <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="40" stroke="#f1f3f9" strokeWidth="8" fill="transparent" />
                   <circle
@@ -288,12 +292,12 @@ export const HomeTab: React.FC = () => {
             </div>
 
             {/* Макронутриенты */}
-            <div className="flex flex-col justify-between gap-3">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Целевые макросы (г)</span>
+            <div className="flex flex-col justify-between gap-2.5">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Целевые макросы (г)</span>
               
               <div className="flex items-center justify-between p-3 bg-white/30 border border-gym-border/35 rounded-xl">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-orange-500 shrink-0"></span>
                   <span className="text-xs font-bold text-gray-600">Белки</span>
                 </div>
                 <span className="text-sm font-extrabold text-orange-500 font-display">{todayPlan.protein.grams}г</span>
@@ -301,7 +305,7 @@ export const HomeTab: React.FC = () => {
 
               <div className="flex items-center justify-between p-3 bg-white/30 border border-gym-border/35 rounded-xl">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 shrink-0"></span>
                   <span className="text-xs font-bold text-gray-600">Жиры</span>
                 </div>
                 <span className="text-sm font-extrabold text-yellow-600 font-display">{todayPlan.fat.grams}г</span>
@@ -309,7 +313,7 @@ export const HomeTab: React.FC = () => {
 
               <div className="flex items-center justify-between p-3 bg-white/30 border border-gym-border/35 rounded-xl">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-500 shrink-0"></span>
                   <span className="text-xs font-bold text-gray-600">Углеводы</span>
                 </div>
                 <span className="text-sm font-extrabold text-cyan-500 font-display">{todayPlan.carbs.grams}г</span>
@@ -317,7 +321,7 @@ export const HomeTab: React.FC = () => {
             </div>
           </div>
           
-          <div className="flex flex-col sm:flex-row sm:gap-6 gap-2 justify-center items-center text-xs text-gray-500 pt-4 border-t border-gym-border/20 mt-4 font-semibold">
+          <div className="flex flex-wrap sm:flex-row sm:gap-6 gap-3 justify-center items-center text-xs text-gray-500 pt-4 border-t border-gym-border/20 mt-4 font-semibold">
             <span className="flex items-center gap-1">
               <Droplet size={14} className="text-blue-500/80" /> Вода: <span className="font-bold text-gray-700 font-display">{todayPlan.water}</span> мл
             </span>
