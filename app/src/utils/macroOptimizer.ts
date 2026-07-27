@@ -232,7 +232,7 @@ export const generateSmartAdvisorAdvice = async (
   }
 
   // Deterministic Expert Fallback Template
-  const itemsText = recommendedItems.map(i => `• **${i.name}**: ${i.grams}г (${i.protein}г белка, ${i.fat}г жира, ${i.carbs}г углей — ${i.calories} ккал)`).join('\n');
+  const itemsText = recommendedItems.map(i => `• ${i.name}: ${i.grams}г (${i.protein}г белка, ${i.fat}г жира, ${i.carbs}г углей — ${i.calories} ккал)`).join('\n');
   
   let keyBenefit = 'закроет остаток калорийности и обеспечит качественное восстановление.';
   if (deficit.protein > 15) {
@@ -243,8 +243,8 @@ export const generateSmartAdvisorAdvice = async (
 
   let note = '';
   if (deficit.calories > 600) {
-    note = '\n\n*У вас остался крупный дефицит. Мы подобрыли разумную порцию здорового перекуса в пределах адекватных норм питания.*';
+    note = '\n\nУ вас остался крупный дефицит. Мы подобрали разумную порцию здорового перекуса в пределах адекватных норм питания.';
   }
 
-  return `Для идеального закрытия остатка КБЖУ рекомендуем следующий перекус:\n\n${itemsText}\n\n**Совет нутрициолога:** Такой порционный добор ${keyBenefit}${note}`;
+  return `Для идеального закрытия остатка КБЖУ рекомендуем следующий перекус:\n\n${itemsText}\n\nСовет нутрициолога: Такой порционный добор ${keyBenefit}${note}`;
 };

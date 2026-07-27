@@ -331,14 +331,17 @@ export const HomeTab: React.FC = () => {
           {/* Выдвигающийся аккордеон с общими ориентирами КБЖУ и TDEE */}
           <div className="border-t border-gym-border/20 pt-4">
             <button
+              type="button"
               onClick={() => setShowMetaDetails(!showMetaDetails)}
-              className="w-full flex justify-between items-center py-2 px-3 text-xs font-bold text-gray-500 hover:text-gym-accent transition-all cursor-pointer bg-gray-50/50 rounded-xl border border-gym-border/20"
+              className="w-full flex justify-between items-center py-2.5 px-3.5 text-xs font-bold text-gray-600 hover:text-gym-accent transition-all cursor-pointer bg-white/70 hover:bg-white rounded-xl border border-gym-border/30 shadow-xs"
             >
-              <span className="flex items-center gap-2">
-                <Activity size={15} className="text-gym-accent" />
-                Подробнее о целях КБЖУ и TDEE расчете
+              <span className="flex items-center gap-2 text-left">
+                <Activity size={16} className="text-gym-accent shrink-0" />
+                <span>Подробнее о целях КБЖУ и TDEE расчете</span>
               </span>
-              {showMetaDetails ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+              <div className="w-6 h-6 rounded-lg bg-gray-100/80 flex items-center justify-center shrink-0 text-gray-500">
+                {showMetaDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </div>
             </button>
 
             <div
@@ -519,11 +522,11 @@ export const HomeTab: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1.5 text-center text-[11px] font-black text-gray-400 uppercase tracking-wider mb-1">
+          <div className="grid grid-cols-7 gap-2 sm:gap-2.5 text-center text-[11px] font-black text-gray-400 uppercase tracking-wider mb-1">
             <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
           </div>
 
-          <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+          <div className="grid grid-cols-7 gap-2 sm:gap-2.5">
             {Array.from({ length: firstDayIndex }).map((_, idx) => (
               <div key={`empty-${idx}`} className="aspect-square h-auto min-h-[38px]"></div>
             ))}
@@ -539,11 +542,13 @@ export const HomeTab: React.FC = () => {
                   key={dateStr}
                   type="button"
                   onClick={() => handleDayClick(dateStr)}
-                  className={`aspect-square h-auto min-h-[38px] p-1 rounded-xl flex flex-col items-center justify-between transition-all cursor-pointer border text-xs font-bold leading-none select-none ${
-                    hasWorkout 
-                      ? 'bg-gym-accent text-white border-gym-accent shadow-sm hover:bg-gym-accent/90' 
-                      : 'bg-white/60 hover:bg-white text-gray-700 border-gym-border/40'
-                  } ${isToday ? 'ring-2 ring-emerald-500 ring-offset-1 z-10' : ''}`}
+                  className={`aspect-square h-auto min-h-[38px] p-1 rounded-xl flex flex-col items-center justify-between transition-all cursor-pointer text-xs font-bold leading-none select-none ${
+                    isToday
+                      ? 'border-2 border-emerald-500 text-emerald-700 bg-emerald-50/40 font-black shadow-xs'
+                      : hasWorkout 
+                        ? 'bg-gym-accent text-white border border-gym-accent shadow-sm hover:bg-gym-accent/90' 
+                        : 'bg-white/60 hover:bg-white text-gray-700 border border-gym-border/40'
+                  }`}
                 >
                   <span className="mt-1">{dayNum}</span>
                   {hasWorkout ? (

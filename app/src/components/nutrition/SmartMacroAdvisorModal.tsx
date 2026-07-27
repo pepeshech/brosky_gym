@@ -85,25 +85,20 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/25 backdrop-blur-[6px] animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-white/85 border border-white/60 backdrop-filter backdrop-blur-2xl rounded-[28px] shadow-[0_16px_48px_rgba(0,0,0,0.08)] animate-scaleUp overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-xs animate-fadeIn">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl border border-gym-border/50 shadow-2xl animate-scaleUp overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="px-6 py-4.5 border-b border-gym-border/30 flex items-center justify-between bg-white/50 backdrop-blur-md">
+        <div className="px-6 py-4 border-b border-gym-border/30 flex items-center justify-between bg-white">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-gym-accent/10 text-gym-accent rounded-2xl flex items-center justify-center">
+            <div className="p-2.5 bg-gym-accent/10 text-gym-accent rounded-2xl flex items-center justify-center shrink-0">
               <Sparkles className="w-5 h-5 text-gym-accent" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-gray-900 text-sm font-display">
-                Brosky NutriEngine — Нутрициолог
+              <h3 className="font-extrabold text-gray-900 text-sm sm:text-base font-display">
+                Умный добор КБЖУ
               </h3>
-                <span className="bg-gym-accent/10 text-gym-accent px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase">
-                  Offline
-                </span>
-              </div>
-              <p className="text-xs text-gray-500 font-sans mt-0.5">Умный порционный подбор вечернего рациона</p>
+              <p className="text-xs text-gray-500 font-sans mt-0.5">Порционный расчет вечернего рациона</p>
             </div>
           </div>
           <button
