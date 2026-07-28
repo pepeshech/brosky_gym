@@ -1,4 +1,6 @@
 import { useState, useEffect, lazy, Suspense, useTransition } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { ModalSpringPresets } from './utils/animationEngine';
 import { ReloadPrompt } from './components/pwa/ReloadPrompt';
 import { useGymStore } from './store/gymStore';
 import { Onboarding } from './components/Onboarding';
@@ -67,16 +69,25 @@ function App() {
       <Header isOnline={isOnline} activeTab={activeTab} setActiveTab={handleTabChange} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex flex-col gap-6 md:gap-8 pb-[calc(env(safe-area-inset-bottom,16px)+68px)] md:pb-8">
-        <div key={renderedTab} className="flex-1 animate-fadeIn">
-          <Suspense fallback={<SkeletonLoader />}>
-            {renderedTab === 'profile' && <HomeTab />}
-            {renderedTab === 'nutrition' && <NutritionTab />}
-            {renderedTab === 'progress' && <ProgressTab />}
-            {renderedTab === 'workout' && <WorkoutTab />}
-            {renderedTab === 'achievements' && <AchievementsTab />}
-            {renderedTab === 'settings' && <SettingsTab />}
-          </Suspense>
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={renderedTab}
+            initial={ModalSpringPresets.tabTransition.initial}
+            animate={ModalSpringPresets.tabTransition.animate}
+            exit={ModalSpringPresets.tabTransition.exit}
+            transition={ModalSpringPresets.tabTransition.transition}
+            className="flex-1"
+          >
+            <Suspense fallback={<SkeletonLoader />}>
+              {renderedTab === 'profile' && <HomeTab />}
+              {renderedTab === 'nutrition' && <NutritionTab />}
+              {renderedTab === 'progress' && <ProgressTab />}
+              {renderedTab === 'workout' && <WorkoutTab />}
+              {renderedTab === 'achievements' && <AchievementsTab />}
+              {renderedTab === 'settings' && <SettingsTab />}
+            </Suspense>
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />

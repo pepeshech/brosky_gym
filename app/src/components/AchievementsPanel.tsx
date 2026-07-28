@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useGymStore } from '../store/gymStore';
+import { triggerPulseAnimation } from '../utils/animationEngine';
 import {
   Dumbbell, Trophy, Layers, Flame, Zap, Coffee, Shield, Star, Activity, Medal, TrendingUp,
 } from './BroskyIcon';
@@ -485,7 +486,8 @@ export const AchievementsPanel: React.FC = () => {
             return (
               <div
                 key={ach.id}
-                className={`relative rounded-xl p-3 sm:p-3.5 border transition-all select-none ${
+                onClick={(e) => triggerPulseAnimation(e.currentTarget)}
+                className={`relative rounded-xl p-3 sm:p-3.5 border transition-all select-none cursor-pointer ${
                   unlocked
                     ? `${ach.bgColor} ${ach.borderColor} shadow-sm`
                     : 'bg-gray-50/60 border-gray-100 opacity-50'

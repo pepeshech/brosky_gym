@@ -1,4 +1,4 @@
-import type { Transition } from 'motion/react';
+import type { Transition, TargetAndTransition } from 'motion/react';
 import gsap from 'gsap';
 import { animate } from 'animejs';
 
@@ -7,25 +7,25 @@ import { animate } from 'animejs';
  */
 export const ModalSpringPresets = {
   backdrop: {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
-    exit: { opacity: 0 },
-    transition: { duration: 0.25, ease: 'easeOut' } as Transition
+    initial: { opacity: 0 } as TargetAndTransition,
+    animate: { opacity: 1 } as TargetAndTransition,
+    exit: { opacity: 0 } as TargetAndTransition,
+    transition: { duration: 0.25, ease: 'easeOut' } as Transition,
   },
 
   container: {
-    initial: { opacity: 0, scale: 0.95, y: 15 },
-    animate: { opacity: 1, scale: 1, y: 0 },
-    exit: { opacity: 0, scale: 1, y: 0 },
-    transition: { type: 'spring', stiffness: 350, damping: 25 } as Transition
+    initial: { opacity: 0, scale: 0.95, y: 15 } as TargetAndTransition,
+    animate: { opacity: 1, scale: 1, y: 0 } as TargetAndTransition,
+    exit: { opacity: 0, scale: 0.95, y: 15 } as TargetAndTransition,
+    transition: { type: 'spring', stiffness: 350, damping: 25 } as Transition,
   },
 
   tabTransition: {
-    initial: { opacity: 0, y: 8 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -8 },
-    transition: { duration: 0.2, ease: [0.25, 0.1, 0.25, 1] } as Transition
-  }
+    initial: { opacity: 0, y: 8 } as TargetAndTransition,
+    animate: { opacity: 1, y: 0 } as TargetAndTransition,
+    exit: { opacity: 0, y: -8 } as TargetAndTransition,
+    transition: { duration: 0.2, ease: [0.25, 0.1, 0.25, 1] } as Transition,
+  },
 };
 
 /**

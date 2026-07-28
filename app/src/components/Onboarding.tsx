@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { ModalSpringPresets } from '../utils/animationEngine';
 import { useGymStore } from '../store/gymStore';
 import type { ProgressEntry } from '../types';
-import { User, Activity, ChevronRight, Zap, Scale, Dumbbell, Flame } from './BroskyIcon';
+import { User, Activity, ChevronRight, ChevronLeft, Zap, Scale, Dumbbell, Flame, Check } from './BroskyIcon';
 import { getTargetStepsForGoal, calculateNavyBodyFat } from '../utils/formulas';
 import { validateData, AthleteProfileSchema, ProgressEntrySchema } from '../utils/validation';
 
@@ -78,6 +80,7 @@ const EditableValue: React.FC<EditableValueProps> = ({ value, min, max, step = 1
 export const Onboarding: React.FC = () => {
   const updateProfile = useGymStore(s => s.updateProfile);
   const addProgressEntry = useGymStore(s => s.addProgressEntry);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [username, setUsername] = useState('');
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [age, setAge] = useState<number>(25);
@@ -99,7 +102,7 @@ export const Onboarding: React.FC = () => {
     const hipsVal = hips !== '' ? parseFloat(hips.toString()) : NaN;
 
     if (isNaN(height) || isNaN(weight) || isNaN(neckVal) || isNaN(waistVal)) {
-      setErrorText('Для расчета процента жира укажите рост, обхват шеи и талии в замерах ниже.');
+      setErrorText('Для расчета процента жира укажите рост, обхват шеи и талии в замерах.');
       return;
     }
 
@@ -181,6 +184,16 @@ export const Onboarding: React.FC = () => {
     return parsed;
   };
 
+  const handleNextStep1 = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username.trim()) {
+      setErrorText('Пожалуйста, введите ваше имя');
+      return;
+    }
+    setErrorText(null);
+    setStep(2);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -204,7 +217,6 @@ export const Onboarding: React.FC = () => {
       return;
     }
 
-    // Создаем стартовую запись замера (вчерашней датой, чтобы новые сегодняшние замеры образовывали прогресс на графике)
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const dateStr = yesterday.toISOString().split('T')[0];
@@ -241,7 +253,6 @@ export const Onboarding: React.FC = () => {
       return;
     }
 
-    // Сохраняем профиль
     updateProfile(profileData);
     addProgressEntry(entry);
   };
@@ -250,322 +261,418 @@ export const Onboarding: React.FC = () => {
     <div className="max-w-2xl mx-auto py-12 px-4 sm:px-6">
       <div className="glass-showcase max-w-[650px] mx-auto">
         
-        {/* Заголовок */}
+        {/* Step indicators */}
+        <div className="flex items-center justify-between mb-8 px-4">
+          {[1, 2, 3].map((stepNum) => (
+            <React.Fragment key={stepNum}>
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all ${
+                    step === stepNum
+                      ? 'bg-gym-accent text-white shadow-md shadow-gym-accent/30 scale-110'
+                      : step > stepNum
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-gray-100 text-gray-400'
+                  }`}
+                >
+                  {step > stepNum ? <Check size={14} /> : stepNum}
+                </div>
+                <span className={`text-xs font-bold hidden sm:inline ${step === stepNum ? 'text-gray-900' : 'text-gray-400'}`}>
+                  {stepNum === 1 ? 'Профиль' : stepNum === 2 ? 'Замеры' : 'Цели'}
+                </span>
+              </div>
+              {stepNum < 3 && <div className={`flex-1 h-1 mx-2 rounded-full transition-all ${step > stepNum ? 'bg-emerald-500' : 'bg-gray-200'}`} />}
+            </React.Fragment>
+          ))}
+        </div>
+
+        {/* Header */}
         <div className="glass-header">
           <div className="inline-flex items-center justify-center p-3.5 bg-gym-accent/10 text-gym-accent rounded-2xl mb-2">
             <Activity size={32} />
           </div>
           <h2>Создание профиля</h2>
-          <p>Настройте ваш профиль для расчета калорий, белков и отслеживания прогресса</p>
+          <p>
+            {step === 1 && 'Шаг 1: Личные данные и антропометрия'}
+            {step === 2 && 'Шаг 2: Начальные замеры тела'}
+            {step === 3 && 'Шаг 3: Спортивная цель и стратегия'}
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Имя/Логин */}
-          <div className="glass-group">
-            <label className="glass-label">Ваш логин / Имя</label>
-            <div className="glass-input-wrapper">
-              <User size={18} />
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                  if (errorText) setErrorText(null);
-                }}
-                placeholder="Введите имя атлета"
-                required
-                className="glass-input"
-              />
-            </div>
-          </div>
-
-          {/* Пол */}
-          <div className="glass-group">
-            <label className="glass-label">Пол</label>
-            <div className="glass-gender-grid">
-              <button
-                type="button"
-                onClick={() => setGender('male')}
-                className={`glass-gender-btn ${gender === 'male' ? 'active' : ''}`}
+        <form onSubmit={step === 3 ? handleSubmit : (e) => e.preventDefault()} className="space-y-6">
+          <AnimatePresence mode="wait">
+            {step === 1 && (
+              <motion.div
+                key="step1"
+                initial={ModalSpringPresets.tabTransition.initial}
+                animate={ModalSpringPresets.tabTransition.animate}
+                exit={ModalSpringPresets.tabTransition.exit}
+                transition={ModalSpringPresets.tabTransition.transition}
+                className="space-y-6"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="10" cy="14" r="6"></circle>
-                  <path d="M14 10l8-8"></path>
-                  <path d="M16 2h6v6"></path>
-                </svg>
-                Мужской
-              </button>
-              <button
-                type="button"
-                onClick={() => setGender('female')}
-                className={`glass-gender-btn ${gender === 'female' ? 'active' : ''}`}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="9" r="6"></circle>
-                  <path d="M12 15v7"></path>
-                  <path d="M9 19h6"></path>
-                </svg>
-                Женский
-              </button>
-            </div>
-          </div>
+                {/* Имя/Логин */}
+                <div className="glass-group">
+                  <label className="glass-label">Ваш логин / Имя</label>
+                  <div className="glass-input-wrapper">
+                    <User size={18} />
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => {
+                        setUsername(e.target.value);
+                        if (errorText) setErrorText(null);
+                      }}
+                      placeholder="Введите имя атлета"
+                      required
+                      className="glass-input"
+                    />
+                  </div>
+                </div>
 
-          {/* Физические параметры (4 слайдера!) */}
-          <div style={{ background: 'rgba(255, 255, 255, 0.5)', border: '1px solid rgba(70, 107, 247, 0.1)', borderRadius: '20px', padding: '20px' }}>
-            <span className="glass-label" style={{ display: 'block', marginBottom: '16px' }}>Физические показатели</span>
-            
-            {/* Возраст */}
-            <div className="slider-row">
-              <div className="slider-meta">
-                <span className="slider-label">Возраст</span>
-                <EditableValue
-                  value={age}
-                  min={14}
-                  max={80}
-                  suffix="лет"
-                  onChange={setAge}
-                />
-              </div>
-              <input
-                type="range"
-                min="14"
-                max="80"
-                value={age}
-                onChange={(e) => setAge(parseInt(e.target.value) || 25)}
-                className="tiles-range-slider"
-              />
-            </div>
+                {/* Пол */}
+                <div className="glass-group">
+                  <label className="glass-label">Пол</label>
+                  <div className="glass-gender-grid">
+                    <button
+                      type="button"
+                      onClick={() => setGender('male')}
+                      className={`glass-gender-btn ${gender === 'male' ? 'active' : ''}`}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="10" cy="14" r="6"></circle>
+                        <path d="M14 10l8-8"></path>
+                        <path d="M16 2h6v6"></path>
+                      </svg>
+                      Мужской
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setGender('female')}
+                      className={`glass-gender-btn ${gender === 'female' ? 'active' : ''}`}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="9" r="6"></circle>
+                        <path d="M12 15v7"></path>
+                        <path d="M9 19h6"></path>
+                      </svg>
+                      Женский
+                    </button>
+                  </div>
+                </div>
 
-            {/* Рост */}
-            <div className="slider-row" style={{ marginTop: '16px' }}>
-              <div className="slider-meta">
-                <span className="slider-label">Рост</span>
-                <EditableValue
-                  value={height}
-                  min={140}
-                  max={210}
-                  suffix="см"
-                  onChange={setHeight}
-                />
-              </div>
-              <input
-                type="range"
-                min="140"
-                max="210"
-                value={height}
-                onChange={(e) => setHeight(parseInt(e.target.value) || 180)}
-                className="tiles-range-slider"
-              />
-            </div>
+                {/* Физические параметры (4 слайдера) */}
+                <div style={{ background: 'rgba(255, 255, 255, 0.5)', border: '1px solid rgba(70, 107, 247, 0.1)', borderRadius: '20px', padding: '20px' }}>
+                  <span className="glass-label" style={{ display: 'block', marginBottom: '16px' }}>Физические показатели</span>
+                  
+                  {/* Возраст */}
+                  <div className="slider-row">
+                    <div className="slider-meta">
+                      <span className="slider-label">Возраст</span>
+                      <EditableValue
+                        value={age}
+                        min={14}
+                        max={80}
+                        suffix="лет"
+                        onChange={setAge}
+                      />
+                    </div>
+                    <input
+                      type="range"
+                      min="14"
+                      max="80"
+                      value={age}
+                      onChange={(e) => setAge(parseInt(e.target.value) || 25)}
+                      className="tiles-range-slider"
+                    />
+                  </div>
 
-            {/* Вес */}
-            <div className="slider-row" style={{ marginTop: '16px' }}>
-              <div className="slider-meta">
-                <span className="slider-label">Вес</span>
-                <EditableValue
-                  value={weight}
-                  min={40}
-                  max={150}
-                  step={0.1}
-                  suffix="кг"
-                  onChange={setWeight}
-                />
-              </div>
-              <input
-                type="range"
-                min="40"
-                max="150"
-                step="0.1"
-                value={weight}
-                onChange={(e) => setWeight(parseFloat(e.target.value) || 82)}
-                className="tiles-range-slider"
-              />
-            </div>
+                  {/* Рост */}
+                  <div className="slider-row" style={{ marginTop: '16px' }}>
+                    <div className="slider-meta">
+                      <span className="slider-label">Рост</span>
+                      <EditableValue
+                        value={height}
+                        min={140}
+                        max={210}
+                        suffix="см"
+                        onChange={setHeight}
+                      />
+                    </div>
+                    <input
+                      type="range"
+                      min="140"
+                      max="210"
+                      value={height}
+                      onChange={(e) => setHeight(parseInt(e.target.value) || 180)}
+                      className="tiles-range-slider"
+                    />
+                  </div>
 
-            {/* Процент жира */}
-            <div className="slider-row" style={{ marginTop: '16px' }}>
-              <div className="slider-meta">
-                <span className="slider-label">Процент жира</span>
-                <EditableValue
-                  value={fatPercent}
-                  min={5}
-                  max={40}
-                  step={0.1}
-                  suffix="%"
-                  onChange={setFatPercent}
-                />
-              </div>
-              <input
-                type="range"
-                min="5"
-                max="40"
-                step="0.1"
-                value={fatPercent}
-                onChange={(e) => setFatPercent(parseFloat(e.target.value) || 16)}
-                className="tiles-range-slider"
-              />
-              <div className="flex justify-end mt-1">
+                  {/* Вес */}
+                  <div className="slider-row" style={{ marginTop: '16px' }}>
+                    <div className="slider-meta">
+                      <span className="slider-label">Вес</span>
+                      <EditableValue
+                        value={weight}
+                        min={40}
+                        max={150}
+                        step={0.1}
+                        suffix="кг"
+                        onChange={setWeight}
+                      />
+                    </div>
+                    <input
+                      type="range"
+                      min="40"
+                      max="150"
+                      step="0.1"
+                      value={weight}
+                      onChange={(e) => setWeight(parseFloat(e.target.value) || 82)}
+                      className="tiles-range-slider"
+                    />
+                  </div>
+
+                  {/* Процент жира */}
+                  <div className="slider-row" style={{ marginTop: '16px' }}>
+                    <div className="slider-meta">
+                      <span className="slider-label">Процент жира</span>
+                      <EditableValue
+                        value={fatPercent}
+                        min={5}
+                        max={40}
+                        step={0.1}
+                        suffix="%"
+                        onChange={setFatPercent}
+                      />
+                    </div>
+                    <input
+                      type="range"
+                      min="5"
+                      max="40"
+                      step="0.1"
+                      value={fatPercent}
+                      onChange={(e) => setFatPercent(parseFloat(e.target.value) || 16)}
+                      className="tiles-range-slider"
+                    />
+                  </div>
+                </div>
+
                 <button
                   type="button"
-                  onClick={calculateFatFromMeasurements}
-                  className="text-[10px] text-gym-accent font-bold hover:underline cursor-pointer flex items-center gap-1 btn-interactive"
+                  onClick={handleNextStep1}
+                  className="btn-submit"
                 >
-                  <Activity size={10} />
-                  {gender === 'male' 
-                    ? 'Рассчитать по обхватам (шея, талия)' 
-                    : 'Рассчитать по обхватам (шея, талия, бёдра)'
-                  }
+                  Далее к замерам
+                  <ChevronRight size={18} />
                 </button>
-              </div>
-            </div>
-          </div>
+              </motion.div>
+            )}
 
-          {/* Начальные замеры тела */}
-          <div style={{ background: 'rgba(255, 255, 255, 0.5)', border: '1px solid rgba(70, 107, 247, 0.1)', borderRadius: '20px', padding: '20px' }}>
-            <span className="glass-label" style={{ display: 'block', marginBottom: '16px' }}>Начальные замеры тела (необязательно, см)</span>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-              <div>
-                <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Грудь</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  value={chest}
-                  onChange={(e) => setChest(parseVal(e.target.value))}
-                  placeholder="—"
-                  className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Талия</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  value={waist}
-                  onChange={(e) => setWaist(parseVal(e.target.value))}
-                  placeholder="—"
-                  className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Шея</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  value={neck}
-                  onChange={(e) => setNeck(parseVal(e.target.value))}
-                  placeholder="—"
-                  className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Бёдра</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  value={hips}
-                  onChange={(e) => setHips(parseVal(e.target.value))}
-                  placeholder="—"
-                  className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Бедро</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  value={thigh}
-                  onChange={(e) => setThigh(parseVal(e.target.value))}
-                  placeholder="—"
-                  className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Бицепс</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  value={biceps}
-                  onChange={(e) => setBiceps(parseVal(e.target.value))}
-                  placeholder="—"
-                  className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
-                />
-              </div>
-            </div>
-          </div>
+            {step === 2 && (
+              <motion.div
+                key="step2"
+                initial={ModalSpringPresets.tabTransition.initial}
+                animate={ModalSpringPresets.tabTransition.animate}
+                exit={ModalSpringPresets.tabTransition.exit}
+                transition={ModalSpringPresets.tabTransition.transition}
+                className="space-y-6"
+              >
+                {/* Начальные замеры тела */}
+                <div style={{ background: 'rgba(255, 255, 255, 0.5)', border: '1px solid rgba(70, 107, 247, 0.1)', borderRadius: '20px', padding: '20px' }}>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="glass-label">Начальные замеры тела (необязательно, см)</span>
+                    <button
+                      type="button"
+                      onClick={calculateFatFromMeasurements}
+                      className="text-[10px] text-gym-accent font-bold hover:underline cursor-pointer flex items-center gap-1 btn-interactive"
+                    >
+                      <Activity size={10} />
+                      Рассчитать % жира
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Грудь</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        value={chest}
+                        onChange={(e) => setChest(parseVal(e.target.value))}
+                        placeholder="—"
+                        className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Талия</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        value={waist}
+                        onChange={(e) => setWaist(parseVal(e.target.value))}
+                        placeholder="—"
+                        className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Шея</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        value={neck}
+                        onChange={(e) => setNeck(parseVal(e.target.value))}
+                        placeholder="—"
+                        className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Бёдра</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        value={hips}
+                        onChange={(e) => setHips(parseVal(e.target.value))}
+                        placeholder="—"
+                        className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Бедро</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        value={thigh}
+                        onChange={(e) => setThigh(parseVal(e.target.value))}
+                        placeholder="—"
+                        className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-500 font-semibold mb-1 text-center">Бицепс</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        value={biceps}
+                        onChange={(e) => setBiceps(parseVal(e.target.value))}
+                        placeholder="—"
+                        className="w-full bg-white border border-gym-border rounded-xl px-2 py-2 text-gray-800 text-center font-bold focus:outline-none focus:border-gym-accent text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
 
-          {/* Выбор питания */}
-          <div className="glass-group">
-            <div className="flex items-center justify-between mb-3">
-              <label className="glass-label">Спортивная цель и стратегия питания</label>
-              <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Выберите режим</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {goals.map((g) => {
-                const isActive = selectedGoal === g.id;
-                return (
+                <div className="flex gap-3">
                   <button
-                    key={g.id}
                     type="button"
-                    onClick={() => setSelectedGoal(g.id)}
-                    className={`relative w-full p-4 rounded-2xl border-2 text-left flex flex-col justify-between transition-all duration-200 ease-out cursor-pointer overflow-hidden ${
-                      isActive 
-                        ? `${g.borderActive} ${g.activeBg} scale-[1.02]` 
-                        : 'border-slate-200/80 bg-white/40 hover:border-slate-300 hover:bg-white/80 hover:scale-[1.01] hover:-translate-y-0.5'
-                    }`}
+                    onClick={() => setStep(1)}
+                    className="py-3.5 px-5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl flex items-center justify-center gap-1 transition-all cursor-pointer"
                   >
-                    {/* Активный эффект индикатора */}
-                    {isActive && (
-                      <span className="absolute top-3 right-3 flex h-2.5 w-2.5">
-                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${g.dotColor} opacity-75`}></span>
-                        <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${g.dotColor}`}></span>
-                      </span>
-                    )}
-
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 pr-4">
-                        <g.IconComponent size={18} className={g.color} />
-                        <span className={`font-extrabold text-xs tracking-tight ${g.color}`}>{g.name}</span>
-                      </div>
-                      <p className="text-[10px] text-gray-500 leading-relaxed font-medium line-clamp-2">{g.desc}</p>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-3 mt-2 border-t border-slate-100/80">
-                      <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${g.pillBg}`}>
-                        {g.badge}
-                      </span>
-                      <span className="text-[10px] font-bold text-gray-400 font-mono">
-                        {g.steps}
-                      </span>
-                    </div>
+                    <ChevronLeft size={18} />
+                    Назад
                   </button>
-                );
-              })}
-            </div>
-          </div>
+                  <button
+                    type="button"
+                    onClick={() => setStep(3)}
+                    className="btn-submit flex-1"
+                  >
+                    Далее к цели
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              </motion.div>
+            )}
 
-          {/* Красивый блок ошибки валидации */}
+            {step === 3 && (
+              <motion.div
+                key="step3"
+                initial={ModalSpringPresets.tabTransition.initial}
+                animate={ModalSpringPresets.tabTransition.animate}
+                exit={ModalSpringPresets.tabTransition.exit}
+                transition={ModalSpringPresets.tabTransition.transition}
+                className="space-y-6"
+              >
+                {/* Выбор питания */}
+                <div className="glass-group">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="glass-label">Спортивная цель и стратегия питания</label>
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Выберите режим</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {goals.map((g) => {
+                      const isActive = selectedGoal === g.id;
+                      return (
+                        <button
+                          key={g.id}
+                          type="button"
+                          onClick={() => setSelectedGoal(g.id)}
+                          className={`relative w-full p-4 rounded-2xl border-2 text-left flex flex-col justify-between transition-all duration-200 ease-out cursor-pointer overflow-hidden ${
+                            isActive 
+                              ? `${g.borderActive} ${g.activeBg} scale-[1.02]` 
+                              : 'border-slate-200/80 bg-white/40 hover:border-slate-300 hover:bg-white/80 hover:scale-[1.01] hover:-translate-y-0.5'
+                          }`}
+                        >
+                          {isActive && (
+                            <span className="absolute top-3 right-3 flex h-2.5 w-2.5">
+                              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${g.dotColor} opacity-75`}></span>
+                              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${g.dotColor}`}></span>
+                            </span>
+                          )}
+
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-2 pr-4">
+                              <g.IconComponent size={18} className={g.color} />
+                              <span className={`font-extrabold text-xs tracking-tight ${g.color}`}>{g.name}</span>
+                            </div>
+                            <p className="text-[10px] text-gray-500 leading-relaxed font-medium line-clamp-2">{g.desc}</p>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-3 mt-2 border-t border-slate-100/80">
+                            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${g.pillBg}`}>
+                              {g.badge}
+                            </span>
+                            <span className="text-[10px] font-bold text-gray-400 font-mono">
+                              {g.steps}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="py-3.5 px-5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl flex items-center justify-center gap-1 transition-all cursor-pointer"
+                  >
+                    <ChevronLeft size={18} />
+                    Назад
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-submit flex-1"
+                  >
+                    Завершить и войти
+                    <Check size={18} />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Ошибка валидации */}
           {errorText && (
-            <div className="flex items-center gap-2 p-3.5 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 text-xs font-semibold animate-fadeIn mb-2 justify-center">
+            <div className="flex items-center gap-2 p-3.5 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 text-xs font-semibold animate-fadeIn justify-center">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>
               <span>{errorText}</span>
             </div>
           )}
-
-          {/* Кнопка сохранения */}
-          <button
-            type="submit"
-            className="btn-submit"
-            style={{ marginTop: '10px' }}
-          >
-            Создать профиль и начать
-            <ChevronRight size={18} />
-          </button>
         </form>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { tabs, type TabId } from './Header';
 
 interface BottomNavProps {
@@ -16,15 +17,22 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as TabId)}
-            className={`bottom-nav-btn ${isActive ? 'nav-active' : ''}`}
+            className={`bottom-nav-btn relative ${isActive ? 'nav-active' : ''}`}
           >
-            <span className="nav-icon">
+            {isActive && (
+              <motion.div
+                layoutId="activeTabIndicator"
+                className="absolute inset-x-1 inset-y-1 bg-persian-blue-500/10 rounded-xl -z-10"
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              />
+            )}
+            <span className="nav-icon relative z-10">
               <Icon
                 style={{ width: '100%', height: '100%' }}
                 className={isActive ? 'stroke-[2.5px]' : 'stroke-[1.8px]'}
               />
             </span>
-            <span className="nav-label">{tab.name}</span>
+            <span className="nav-label relative z-10">{tab.name}</span>
           </button>
         );
       })}

@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { triggerPulseAnimation, animateProgressBar } from '../utils/animationEngine';
 import { useGymStore, calcEpley1RM, MUSCLE_GROUPS, MUSCLE_COLORS, EQUIPMENT_TYPES } from '../store/gymStore';
 import type {
   WorkoutTemplate, WorkoutTemplateExercise, ExerciseLog, SetLog, Exercise, PersonalRecord, WorkoutSession, } from '../types';
@@ -326,6 +328,14 @@ const SessionTab: React.FC<SessionTabProps> = ({ onTabChange }) => {
   );
   const progressPct = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
 
+  const progressBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (progressBarRef.current) {
+      animateProgressBar(progressBarRef.current, progressPct);
+    }
+  }, [progressPct]);
+
   // Get PR for exercise
   const getPR = (exId: string): PersonalRecord | undefined =>
     personalRecords.find((pr) => pr.exerciseId === exId);
@@ -553,7 +563,8 @@ const SessionTab: React.FC<SessionTabProps> = ({ onTabChange }) => {
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full transition-all duration-500"
+                ref={progressBarRef}
+                className="h-full rounded-full"
                 style={{
                   width: `${progressPct}%`,
                   background: `linear-gradient(90deg, ${template?.color ?? '#466bf7'}, ${template?.color ?? '#466bf7'}bb)`,
@@ -587,250 +598,260 @@ const SessionTab: React.FC<SessionTabProps> = ({ onTabChange }) => {
       )}
 
       {/* Exercise cards */}
-      {orderedExercises.map((tmplEx) => {
-        const ex = exercises.find((e) => e.id === tmplEx.exerciseId);
-        if (!ex) return null;
-        const log = logs[tmplEx.exerciseId];
-        if (!log) return null;
-        const pr = getPR(tmplEx.exerciseId);
-        const color = MUSCLE_COLORS[ex.muscleGroup] ?? '#007aff';
-        const isNewPR = newPRs.includes(ex.id);
+      <AnimatePresence>
+        {orderedExercises.map((tmplEx) => {
+          const ex = exercises.find((e) => e.id === tmplEx.exerciseId);
+          if (!ex) return null;
+          const log = logs[tmplEx.exerciseId];
+          if (!log) return null;
+          const pr = getPR(tmplEx.exerciseId);
+          const color = MUSCLE_COLORS[ex.muscleGroup] ?? '#007aff';
+          const isNewPR = newPRs.includes(ex.id);
 
-        const lastSession = [...workoutSessions]
-          .reverse()
-          .find((s) => s.date !== sessionDate && s.logs[tmplEx.exerciseId]);
-        const lastSessionLog = lastSession?.logs[tmplEx.exerciseId];
-        const lastValidSets = lastSessionLog?.sets.filter(s => s.isCompleted && s.weight > 0 && s.reps > 0) || [];
+          const lastSession = [...workoutSessions]
+            .reverse()
+            .find((s) => s.date !== sessionDate && s.logs[tmplEx.exerciseId]);
+          const lastSessionLog = lastSession?.logs[tmplEx.exerciseId];
+          const lastValidSets = lastSessionLog?.sets.filter(s => s.isCompleted && s.weight > 0 && s.reps > 0) || [];
 
-        return (
-          <div
-            key={tmplEx.exerciseId}
-            className="glass-panel rounded-2xl overflow-hidden shadow-sm border transition-all"
-            style={isNewPR ? { borderColor: '#f59e0b', boxShadow: '0 0 0 1px #f59e0b40, 0 4px 20px #f59e0b20' } : {}}
-          >
-            {/* Exercise header */}
-            <div className="px-5 py-4 flex items-start justify-between" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
-                  <h4 className="font-bold text-gray-800 text-sm">{ex.name}</h4>
-                  {(ex.muscleGroups || [ex.muscleGroup]).map((m, i) => (
-                    <span
-                      key={m}
-                      className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                      style={{ 
-                        background: i === 0 ? hex2rgba(color, 0.1) : '#f3f4f6', 
-                        color: i === 0 ? color : '#6b7280' 
-                      }}
-                    >
-                      {m}
-                    </span>
-                  ))}
-                  {isNewPR && (
-                    <span className="text-[10px] font-bold text-amber-600 flex items-center gap-0.5">
-                      <Trophy size={11} className="text-amber-500" fill="currentColor" fillOpacity={0.15} /> Рекорд!
-                    </span>
-                  )}
-                </div>
-                {pr && (
-                  <p className="text-[11px] text-gray-400 mt-1 ml-4">
-                    PR: <span className="font-bold text-gray-600">{pr.weight1rm} кг</span>
-                    {pr.actualWeight && ` (${pr.actualWeight}×${pr.actualReps})`}
-                  </p>
-                )}
-                {workoutStarted && (() => {
-                  const autoPilotRec = calculateAutoPilotRecommendation(ex.id, workoutSessions, profile, 8);
-                  return (
-                    <div className="mt-2.5 space-y-1.5">
-                      <div className={`p-2.5 rounded-xl text-xs border flex items-center justify-between gap-2 shadow-2xs select-none ${
-                        autoPilotRec.protectionActive
-                          ? 'bg-rose-50/80 border-rose-200/70 text-rose-800'
-                          : 'bg-indigo-50/60 border-indigo-100/60 text-gray-800'
-                      }`}>
-                        <div className="flex items-center gap-2">
-                          <Sparkles size={14} className={autoPilotRec.protectionActive ? 'text-rose-500 flex-shrink-0' : 'text-gym-accent flex-shrink-0'} />
-                          <div className="flex flex-col">
-                            <span className="font-extrabold text-xs">
-                              ИИ-Автопилот: {autoPilotRec.recommendedWeight} кг × {autoPilotRec.recommendedReps} (RIR {autoPilotRec.targetRir})
-                            </span>
-                            <span className="text-[10px] text-gray-500 font-normal leading-tight mt-0.5">
-                              {autoPilotRec.reason}
-                            </span>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setLogs(prev => {
-                              const currentSets = prev[ex.id]?.sets || [];
-                              const updatedSets = currentSets.map(s => ({
-                                ...s,
-                                weight: autoPilotRec.recommendedWeight,
-                                reps: autoPilotRec.recommendedReps,
-                                rir: autoPilotRec.targetRir,
-                              }));
-                              return { ...prev, [ex.id]: { ...prev[ex.id], sets: updatedSets } };
-                            });
-                          }}
-                          className="px-2.5 py-1 bg-gym-accent hover:bg-blue-600 text-white font-bold text-[10px] rounded-lg transition-all cursor-pointer flex-shrink-0"
-                        >
-                          Заполнить ИИ
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-              
-              {/* Previous session history */}
-              {lastValidSets.length > 0 && (
-                <div className="hidden sm:block text-right ml-4">
-                  <p className="text-[10px] text-gray-400 font-semibold mb-1 uppercase tracking-wider">Прошлая тренировка</p>
-                  <div className="flex flex-col gap-0.5">
-                    {lastValidSets.map((s, idx) => (
-                      <span key={idx} className="text-[11px] font-mono text-gray-500 bg-gray-50 px-2 py-0.5 rounded-md inline-block whitespace-nowrap">
-                        {s.weight}кг × {s.reps}
+          return (
+            <motion.div
+              key={tmplEx.exerciseId}
+              layout
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.25 }}
+              className="glass-panel rounded-2xl overflow-hidden shadow-sm border transition-all"
+              style={isNewPR ? { borderColor: '#f59e0b', boxShadow: '0 0 0 1px #f59e0b40, 0 4px 20px #f59e0b20' } : {}}
+            >
+              {/* Exercise header */}
+              <div className="px-5 py-4 flex items-start justify-between" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
+                    <h4 className="font-bold text-gray-800 text-sm">{ex.name}</h4>
+                    {(ex.muscleGroups || [ex.muscleGroup]).map((m, i) => (
+                      <span
+                        key={m}
+                        className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                        style={{ 
+                          background: i === 0 ? hex2rgba(color, 0.1) : '#f3f4f6', 
+                          color: i === 0 ? color : '#6b7280' 
+                        }}
+                      >
+                        {m}
                       </span>
                     ))}
+                    {isNewPR && (
+                      <span className="text-[10px] font-bold text-amber-600 flex items-center gap-0.5">
+                        <Trophy size={11} className="text-amber-500" fill="currentColor" fillOpacity={0.15} /> Рекорд!
+                      </span>
+                    )}
                   </div>
+                  {pr && (
+                    <p className="text-[11px] text-gray-400 mt-1 ml-4">
+                      PR: <span className="font-bold text-gray-600">{pr.weight1rm} кг</span>
+                      {pr.actualWeight && ` (${pr.actualWeight}×${pr.actualReps})`}
+                    </p>
+                  )}
+                  {workoutStarted && (() => {
+                    const autoPilotRec = calculateAutoPilotRecommendation(ex.id, workoutSessions, profile, 8);
+                    return (
+                      <div className="mt-2.5 space-y-1.5">
+                        <div className={`p-2.5 rounded-xl text-xs border flex items-center justify-between gap-2 shadow-2xs select-none ${
+                          autoPilotRec.protectionActive
+                            ? 'bg-rose-50/80 border-rose-200/70 text-rose-800'
+                            : 'bg-indigo-50/60 border-indigo-100/60 text-gray-800'
+                        }`}>
+                          <div className="flex items-center gap-2">
+                            <Sparkles size={14} className={autoPilotRec.protectionActive ? 'text-rose-500 flex-shrink-0' : 'text-gym-accent flex-shrink-0'} />
+                            <div className="flex flex-col">
+                              <span className="font-extrabold text-xs">
+                                ИИ-Автопилот: {autoPilotRec.recommendedWeight} кг × {autoPilotRec.recommendedReps} (RIR {autoPilotRec.targetRir})
+                              </span>
+                              <span className="text-[10px] text-gray-500 font-normal leading-tight mt-0.5">
+                                {autoPilotRec.reason}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setLogs(prev => {
+                                const currentSets = prev[ex.id]?.sets || [];
+                                const updatedSets = currentSets.map(s => ({
+                                  ...s,
+                                  weight: autoPilotRec.recommendedWeight,
+                                  reps: autoPilotRec.recommendedReps,
+                                  rir: autoPilotRec.targetRir,
+                                }));
+                                return { ...prev, [ex.id]: { ...prev[ex.id], sets: updatedSets } };
+                              });
+                            }}
+                            className="px-2.5 py-1 bg-gym-accent hover:bg-blue-600 text-white font-bold text-[10px] rounded-lg transition-all cursor-pointer flex-shrink-0"
+                          >
+                            Заполнить ИИ
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
-              )}
-              
-              {lastValidSets.length > 0 && (
-                <div className="sm:hidden text-right ml-2 flex flex-col justify-center">
-                  <p className="text-[10px] text-gray-400 font-semibold mb-1">Ранее</p>
-                  <span className="text-[11px] font-mono text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded inline-block whitespace-nowrap">
-                    {lastValidSets[0].weight}×{lastValidSets[0].reps}
-                    {lastValidSets.length > 1 && <span className="text-gray-400 ml-1">+{lastValidSets.length - 1}</span>}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Sets */}
-            <div className="px-3 sm:px-5 py-3 space-y-2 w-full">
-              <div className="grid grid-cols-[24px_1fr_1.5fr_1.5fr_32px] sm:grid-cols-[32px_1fr_2fr_2fr_40px] gap-2 sm:gap-4 text-[10px] sm:text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
-                <span>#</span>
-                <span></span>
-                <span className="text-center">Вес (кг)</span>
-                <span className="text-center">Повт.</span>
-                <span></span>
+                
+                {/* Previous session history */}
+                {lastValidSets.length > 0 && (
+                  <div className="hidden sm:block text-right ml-4">
+                    <p className="text-[10px] text-gray-400 font-semibold mb-1 uppercase tracking-wider">Прошлая тренировка</p>
+                    <div className="flex flex-col gap-0.5">
+                      {lastValidSets.map((s, idx) => (
+                        <span key={idx} className="text-[11px] font-mono text-gray-500 bg-gray-50 px-2 py-0.5 rounded-md inline-block whitespace-nowrap">
+                          {s.weight}кг × {s.reps}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {lastValidSets.length > 0 && (
+                  <div className="sm:hidden text-right ml-2 flex flex-col justify-center">
+                    <p className="text-[10px] text-gray-400 font-semibold mb-1">Ранее</p>
+                    <span className="text-[11px] font-mono text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded inline-block whitespace-nowrap">
+                      {lastValidSets[0].weight}×{lastValidSets[0].reps}
+                      {lastValidSets.length > 1 && <span className="text-gray-400 ml-1">+{lastValidSets.length - 1}</span>}
+                    </span>
+                  </div>
+                )}
               </div>
 
-              {log.sets.map((set) => {
-                const currentRir = set.rir ?? (set.rpe ? 10 - set.rpe : 0);
-                const setRM = set.weight > 0 && set.reps > 0 ? calculateAdjusted1RM(set.weight, set.reps, currentRir) : null;
-                const isBetter = pr && setRM != null && setRM > pr.weight1rm;
-                return (
-                  <div
-                    key={set.setIndex}
-                    className="grid grid-cols-[24px_1fr_1.5fr_1.5fr_32px] sm:grid-cols-[32px_1fr_2fr_2fr_40px] gap-2 sm:gap-4 items-center rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 transition-all"
-                    style={set.isCompleted ? { background: 'rgba(16, 185, 129, 0.08)' } : {}}
-                  >
-                    <span className="text-[10px] sm:text-xs font-bold text-gray-400 tabular-nums text-center">{set.setIndex + 1}</span>
-                    <div className="flex flex-col items-center justify-center min-w-0">
-                      {isBetter && <Trophy size={10} className="text-amber-500 flex-shrink-0 mb-0.5" />}
-                      {set.isCompleted ? (
-                        <div className="flex flex-col items-center gap-0.5 animate-fadeIn">
-                          <span className="text-[8px] font-bold text-gray-400 select-none">Запас (RIR)</span>
-                          <div className="flex gap-0.5">
-                            {[0, 1, 2, 3].map(val => (
-                              <button
-                                key={val}
-                                onClick={() => {
-                                  handleSetChange(tmplEx.exerciseId, set.setIndex, 'rir', val);
-                                  handleSetChange(tmplEx.exerciseId, set.setIndex, 'rpe', 10 - val);
-                                }}
-                                className={`w-[21px] h-[21px] rounded-full text-[9px] font-black flex items-center justify-center transition-all btn-interactive cursor-pointer select-none ${
-                                  currentRir === val 
-                                    ? 'bg-gym-accent text-white shadow-md shadow-gym-accent/30 scale-105' 
-                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                                }`}
-                                title={`Запас: ${val} повт. (RPE ${10 - val})`}
-                              >
-                                +{val}
-                              </button>
-                            ))}
+              {/* Sets */}
+              <div className="px-3 sm:px-5 py-3 space-y-2 w-full">
+                <div className="grid grid-cols-[24px_1fr_1.5fr_1.5fr_32px] sm:grid-cols-[32px_1fr_2fr_2fr_40px] gap-2 sm:gap-4 text-[10px] sm:text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  <span>#</span>
+                  <span></span>
+                  <span className="text-center">Вес (кг)</span>
+                  <span className="text-center">Повт.</span>
+                  <span></span>
+                </div>
+
+                {log.sets.map((set) => {
+                  const currentRir = set.rir ?? (set.rpe ? 10 - set.rpe : 0);
+                  const setRM = set.weight > 0 && set.reps > 0 ? calculateAdjusted1RM(set.weight, set.reps, currentRir) : null;
+                  const isBetter = pr && setRM != null && setRM > pr.weight1rm;
+                  return (
+                    <div
+                      key={set.setIndex}
+                      className="grid grid-cols-[24px_1fr_1.5fr_1.5fr_32px] sm:grid-cols-[32px_1fr_2fr_2fr_40px] gap-2 sm:gap-4 items-center rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 transition-all"
+                      style={set.isCompleted ? { background: 'rgba(16, 185, 129, 0.08)' } : {}}
+                    >
+                      <span className="text-[10px] sm:text-xs font-bold text-gray-400 tabular-nums text-center">{set.setIndex + 1}</span>
+                      <div className="flex flex-col items-center justify-center min-w-0">
+                        {isBetter && <Trophy size={10} className="text-amber-500 flex-shrink-0 mb-0.5" />}
+                        {set.isCompleted ? (
+                          <div className="flex flex-col items-center gap-0.5 animate-fadeIn">
+                            <span className="text-[8px] font-bold text-gray-400 select-none">Запас (RIR)</span>
+                            <div className="flex gap-0.5">
+                              {[0, 1, 2, 3].map(val => (
+                                <button
+                                  key={val}
+                                  onClick={() => {
+                                    handleSetChange(tmplEx.exerciseId, set.setIndex, 'rir', val);
+                                    handleSetChange(tmplEx.exerciseId, set.setIndex, 'rpe', 10 - val);
+                                  }}
+                                  className={`w-[21px] h-[21px] rounded-full text-[9px] font-black flex items-center justify-center transition-all btn-interactive cursor-pointer select-none ${
+                                    currentRir === val 
+                                      ? 'bg-gym-accent text-white shadow-md shadow-gym-accent/30 scale-105' 
+                                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                  }`}
+                                  title={`Запас: ${val} повт. (RPE ${10 - val})`}
+                                >
+                                  +{val}
+                                </button>
+                              ))}
+                            </div>
+                            {setRM != null && (
+                              <span className="text-[8px] font-bold text-gym-accent mt-0.5 tabular-nums">
+                                ~{setRM}кг
+                              </span>
+                            )}
                           </div>
-                          {setRM != null && (
-                            <span className="text-[8px] font-bold text-gym-accent mt-0.5 tabular-nums">
+                        ) : (
+                          setRM != null && (
+                            <span className="text-[9px] sm:text-[11px] text-gray-400 tabular-nums truncate">
                               ~{setRM}кг
                             </span>
-                          )}
-                        </div>
-                      ) : (
-                        setRM != null && (
-                          <span className="text-[9px] sm:text-[11px] text-gray-400 tabular-nums truncate">
-                            ~{setRM}кг
+                          )
+                        )}
+                      </div>
+                      <div className="relative w-full">
+                        <label htmlFor={`weight-${tmplEx.exerciseId}-${set.setIndex}`} className="sr-only">Weight</label>
+                        <input
+                          id={`weight-${tmplEx.exerciseId}-${set.setIndex}`}
+                          type="number"
+                          step="0.5"
+                          disabled={!workoutStarted}
+                          value={set.weight || ''}
+                          onChange={(e) => handleSetChange(tmplEx.exerciseId, set.setIndex, 'weight', parseFloat(e.target.value) || 0)}
+                          placeholder="—"
+                          className="w-full bg-white/80 border border-gym-border rounded-lg px-1.5 py-1 text-center font-bold text-gray-800 focus:outline-none focus:border-gym-accent text-xs sm:text-sm tabular-nums disabled:opacity-50"
+                        />
+                        {set.isOverloaded && (
+                          <span className="absolute -top-1.5 -right-1 bg-emerald-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white flex items-center justify-center shadow-xs select-none pointer-events-none transform scale-90 sm:scale-100">
+                            +{ set.overloadAmount }кг
                           </span>
-                        )
-                      )}
-                    </div>
-                    <div className="relative w-full">
-                      <label htmlFor={`weight-${tmplEx.exerciseId}-${set.setIndex}`} className="sr-only">Weight</label>
+                        )}
+                      </div>
+                      <label htmlFor={`reps-${tmplEx.exerciseId}-${set.setIndex}`} className="sr-only">Reps</label>
                       <input
-                        id={`weight-${tmplEx.exerciseId}-${set.setIndex}`}
+                        id={`reps-${tmplEx.exerciseId}-${set.setIndex}`}
                         type="number"
-                        step="0.5"
+                        step="1"
                         disabled={!workoutStarted}
-                        value={set.weight || ''}
-                        onChange={(e) => handleSetChange(tmplEx.exerciseId, set.setIndex, 'weight', parseFloat(e.target.value) || 0)}
+                        value={set.reps || ''}
+                        onChange={(e) => handleSetChange(tmplEx.exerciseId, set.setIndex, 'reps', parseInt(e.target.value) || 0)}
                         placeholder="—"
                         className="w-full bg-white/80 border border-gym-border rounded-lg px-1.5 py-1 text-center font-bold text-gray-800 focus:outline-none focus:border-gym-accent text-xs sm:text-sm tabular-nums disabled:opacity-50"
                       />
-                      {set.isOverloaded && (
-                        <span className="absolute -top-1.5 -right-1 bg-emerald-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white flex items-center justify-center shadow-xs select-none pointer-events-none transform scale-90 sm:scale-100">
-                          +{ set.overloadAmount }кг
-                        </span>
-                      )}
+                      <button
+                        disabled={!workoutStarted}
+                        onClick={(e) => {
+                          triggerPulseAnimation(e.currentTarget);
+                          handleSetComplete(tmplEx.exerciseId, set.setIndex);
+                        }}
+                        className="flex items-center justify-center w-full h-8 sm:h-9 rounded-lg border transition-all disabled:opacity-30 cursor-pointer shadow-sm"
+                        style={set.isCompleted
+                          ? { background: 'rgba(16, 185, 129, 0.15)', borderColor: 'rgba(16, 185, 129, 0.4)', color: '#10b981' }
+                          : { background: '#f3f4f6', borderColor: '#e5e7eb', color: '#9ca3af' }}
+                      >
+                        <CheckCircle size={16} className={set.isCompleted ? 'fill-emerald-100' : ''} />
+                      </button>
                     </div>
-                    <label htmlFor={`reps-${tmplEx.exerciseId}-${set.setIndex}`} className="sr-only">Reps</label>
-                    <input
-                      id={`reps-${tmplEx.exerciseId}-${set.setIndex}`}
-                      type="number"
-                      step="1"
-                      disabled={!workoutStarted}
-                      value={set.reps || ''}
-                      onChange={(e) => handleSetChange(tmplEx.exerciseId, set.setIndex, 'reps', parseInt(e.target.value) || 0)}
-                      placeholder="—"
-                      className="w-full bg-white/80 border border-gym-border rounded-lg px-1.5 py-1 text-center font-bold text-gray-800 focus:outline-none focus:border-gym-accent text-xs sm:text-sm tabular-nums disabled:opacity-50"
-                    />
-                    <button
-                      disabled={!workoutStarted}
-                      onClick={() => handleSetComplete(tmplEx.exerciseId, set.setIndex)}
-                      className="flex items-center justify-center w-full h-8 sm:h-9 rounded-lg border transition-all disabled:opacity-30 cursor-pointer shadow-sm"
-                      style={set.isCompleted
-                        ? { background: 'rgba(16, 185, 129, 0.15)', borderColor: 'rgba(16, 185, 129, 0.4)', color: '#10b981' }
-                        : { background: '#f3f4f6', borderColor: '#e5e7eb', color: '#9ca3af' }}
-                    >
-                      <CheckCircle size={16} className={set.isCompleted ? 'fill-emerald-100' : ''} />
-                    </button>
-                  </div>
-                );
-              })}
+                  );
+                })}
 
-              {workoutStarted && (
-                <div className="flex items-center gap-2 pt-1">
-                  <button
-                    onClick={() => addSet(tmplEx.exerciseId)}
-                    className="flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-gym-accent transition-colors"
-                  >
-                    <Plus size={12} /> Подход
-                  </button>
-                  {log.sets.length > 1 && (
+                {workoutStarted && (
+                  <div className="flex items-center gap-2 pt-1">
                     <button
-                      onClick={() => removeSet(tmplEx.exerciseId, log.sets.length - 1)}
-                      className="flex items-center gap-1 text-xs font-semibold text-gray-300 hover:text-rose-400 transition-colors"
+                      onClick={() => addSet(tmplEx.exerciseId)}
+                      className="flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-gym-accent transition-colors"
                     >
-                      <X size={12} /> Убрать
+                      <Plus size={12} /> Подход
                     </button>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
+                    {log.sets.length > 1 && (
+                      <button
+                        onClick={() => removeSet(tmplEx.exerciseId, log.sets.length - 1)}
+                        className="flex items-center gap-1 text-xs font-semibold text-gray-300 hover:text-rose-400 transition-colors"
+                      >
+                        <X size={12} /> Убрать
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
 
       {/* Session notes + save */}
       {template && workoutStarted && (

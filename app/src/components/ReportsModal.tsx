@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'motion/react';
+import { ModalSpringPresets } from '../utils/animationEngine';
 import { useGymStore } from '../store/gymStore';
 import { X, Flame, ChevronLeft, ChevronRight, Dumbbell, Footprints, TrendingUp, TrendingDown, Calendar, Download, Printer, ArrowLeft } from './BroskyIcon';
 import { calculatePeriodStats, generatePeriodReportCSV, downloadCSV, generatePeriodReportPDFWindow } from '../utils/reportExporter';
@@ -236,8 +238,6 @@ export const ReportsModal: React.FC<ReportsModalProps> = ({ isOpen, onClose }) =
     };
   }, [startDate, endDate, nutritionLogs, workoutSessions, progress, profile.weight, profile.selectedGoal]);
 
-  if (!isOpen) return null;
-
   const formatDateLabel = (dateStr: string) => {
     if (!dateStr) return '';
     const parts = dateStr.split('-');
@@ -258,14 +258,26 @@ export const ReportsModal: React.FC<ReportsModalProps> = ({ isOpen, onClose }) =
     return `${parseInt(d)} ${months[mIdx]} ${y}`;
   };
 
-  // periodLabel removed as it was unused
-
   const todayStr = new Date().toISOString().split('T')[0];
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
-      {/* Контейнер модального окна стал шире (max-w-2xl) */}
-      <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={ModalSpringPresets.backdrop.initial}
+          animate={ModalSpringPresets.backdrop.animate}
+          exit={ModalSpringPresets.backdrop.exit}
+          transition={ModalSpringPresets.backdrop.transition}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+        >
+          {/* Контейнер модального окна */}
+          <motion.div
+            initial={ModalSpringPresets.container.initial}
+            animate={ModalSpringPresets.container.animate}
+            exit={ModalSpringPresets.container.exit}
+            transition={ModalSpringPresets.container.transition}
+            className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+          >
         
         {/* Заголовок */}
         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50/50">
@@ -617,8 +629,10 @@ export const ReportsModal: React.FC<ReportsModalProps> = ({ isOpen, onClose }) =
             </div>
           )}
         </div>
-      </div>
-    </div>,
+      </motion.div>
+    </motion.div>
+      )}
+    </AnimatePresence>,
     document.body
   );
 };

@@ -1,4 +1,5 @@
-import React, { useState, useContext, useMemo } from 'react';
+import React, { useState, useContext, useMemo, useEffect, useRef } from 'react';
+import gsap from 'gsap';
 import { MUSCLE_COLORS } from '../store/gymStore';
 
 // Ссылочные мышечные группы для карты
@@ -38,6 +39,8 @@ const AnatomyContext = React.createContext<{
   getFilterEffect: (group: MuscleGroupKey) => string | undefined;
   handleGroupClick: (group: MuscleGroupKey) => void;
   setHovered: (group: MuscleGroupKey | null) => void;
+  selectedFilter?: string | null;
+  activeMain?: string | null;
 } | null>(null);
 
 const MuscleGroup: React.FC<{ group: MuscleGroupKey; children: React.ReactNode }> = React.memo(({
@@ -45,14 +48,50 @@ const MuscleGroup: React.FC<{ group: MuscleGroupKey; children: React.ReactNode }
   children,
 }) => {
   const ctx = useContext(AnatomyContext);
+  const groupRef = useRef<SVGGElement>(null);
+
   if (!ctx) return <g>{children}</g>;
 
   const fillColor = ctx.getFillColor(group);
   const strokeColor = ctx.getStrokeColor(group);
   const filterEffect = ctx.getFilterEffect(group);
+  const isSelected = ctx.selectedFilter === group || ctx.activeMain === group;
+
+  useEffect(() => {
+    if (groupRef.current) {
+      gsap.to(groupRef.current, {
+        fill: fillColor,
+        stroke: strokeColor,
+        duration: 0.6,
+        ease: 'power1.inOut'
+      });
+    }
+  }, [fillColor, strokeColor]);
+
+  useEffect(() => {
+    if (!groupRef.current) return;
+    if (isSelected) {
+      const tween = gsap.to(groupRef.current, {
+        strokeWidth: 2.5,
+        duration: 0.8,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      });
+      return () => {
+        tween.kill();
+        if (groupRef.current) {
+          gsap.set(groupRef.current, { strokeWidth: 0.5 });
+        }
+      };
+    } else {
+      gsap.set(groupRef.current, { strokeWidth: 0.5 });
+    }
+  }, [isSelected]);
 
   return (
     <g
+      ref={groupRef}
       onClick={() => ctx.handleGroupClick(group)}
       onMouseEnter={() => ctx.setHovered(group)}
       onMouseLeave={() => ctx.setHovered(null)}
@@ -63,7 +102,6 @@ const MuscleGroup: React.FC<{ group: MuscleGroupKey; children: React.ReactNode }
         strokeWidth: 0.5,
         strokeLinejoin: 'round',
         filter: filterEffect,
-        transition: 'fill 0.25s ease, stroke 0.25s ease, filter 0.25s ease',
       }}
     >
       {children}
@@ -411,7 +449,9 @@ export const AnatomyModel: React.FC<AnatomyModelProps> = React.memo(({
     getStrokeColor,
     getFilterEffect,
     handleGroupClick,
-    setHovered
+    setHovered,
+    selectedFilter,
+    activeMain
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [activeMain, activeSecondary, selectedFilter, hovered, mode, weeklyLoads]);
 

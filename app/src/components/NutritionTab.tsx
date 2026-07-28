@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import gsap from 'gsap';
+import { animateCounter } from '../utils/animationEngine';
 import { useGymStore } from '../store/gymStore';
 import { generateDietPlans, calculateNEAT } from '../utils/formulas';
 import { Droplet, Trash2, Calendar, Plus, Sparkles, RefreshCw, ChevronLeft, ChevronRight, Search, Footprints, LoaderPulse, BookOpen, Settings, Target, Barcode, Camera } from './BroskyIcon';
@@ -720,6 +722,47 @@ export const NutritionTab: React.FC = React.memo(() => {
   const strokePercentFat = Math.min(rawPercentFat, 100);
   const strokePercentCarbs = Math.min(rawPercentCarbs, 100);
 
+  const eatenCalRef = useRef<HTMLSpanElement>(null);
+  const eatenWaterRef = useRef<HTMLSpanElement>(null);
+  const eatenStepsRef = useRef<HTMLSpanElement>(null);
+
+  const calCircleRef = useRef<SVGCircleElement>(null);
+  const stepsCircleRef = useRef<SVGCircleElement>(null);
+  const waterCircleRef = useRef<SVGCircleElement>(null);
+
+  useEffect(() => {
+    if (eatenCalRef.current) animateCounter(eatenCalRef.current, eatenCalories, 0.8, 0);
+  }, [eatenCalories]);
+
+  useEffect(() => {
+    if (eatenWaterRef.current) animateCounter(eatenWaterRef.current, eatenWater, 0.8, 0);
+  }, [eatenWater]);
+
+  useEffect(() => {
+    if (eatenStepsRef.current) animateCounter(eatenStepsRef.current, eatenSteps, 0.8, 0);
+  }, [eatenSteps]);
+
+  useEffect(() => {
+    if (calCircleRef.current) {
+      const targetOffset = 553 - (553 * percentCal) / 100;
+      gsap.to(calCircleRef.current, { strokeDashoffset: targetOffset, duration: 0.8, ease: 'power2.out' });
+    }
+  }, [percentCal]);
+
+  useEffect(() => {
+    if (stepsCircleRef.current) {
+      const targetOffset = 452 - (452 * percentSteps) / 100;
+      gsap.to(stepsCircleRef.current, { strokeDashoffset: targetOffset, duration: 0.8, ease: 'power2.out' });
+    }
+  }, [percentSteps]);
+
+  useEffect(() => {
+    if (waterCircleRef.current) {
+      const targetOffset = 352 - (352 * percentWater) / 100;
+      gsap.to(waterCircleRef.current, { strokeDashoffset: targetOffset, duration: 0.8, ease: 'power2.out' });
+    }
+  }, [percentWater]);
+
   // Быстрый инкремент Воды и Шагов
   const handleQuickAddWater = (amount: number) => {
     const existingItems = currentDayLog?.items || [];
@@ -1015,22 +1058,19 @@ export const NutritionTab: React.FC = React.memo(() => {
                       <circle cx="100" cy="100" r="56" fill="none" stroke="rgba(59, 130, 246, 0.08)" strokeWidth="11" />
                       
                       {/* Калории (Rose) */}
-                      <circle cx="100" cy="100" r="88" fill="none" stroke="#f43f5e" strokeWidth="11"
+                      <circle ref={calCircleRef} cx="100" cy="100" r="88" fill="none" stroke="#f43f5e" strokeWidth="11"
                               strokeDasharray="553" strokeDashoffset={553 - (553 * percentCal) / 100}
                               strokeLinecap="round" transform="rotate(-90 100 100)" 
-                              className="transition-all duration-500 ease-out"
                               style={{ opacity: percentCal > 0 ? 1 : 0 }} />
                       {/* Шаги (Emerald) */}
-                      <circle cx="100" cy="100" r="72" fill="none" stroke="#10b981" strokeWidth="11"
+                      <circle ref={stepsCircleRef} cx="100" cy="100" r="72" fill="none" stroke="#10b981" strokeWidth="11"
                               strokeDasharray="452" strokeDashoffset={452 - (452 * percentSteps) / 100}
                               strokeLinecap="round" transform="rotate(-90 100 100)" 
-                              className="transition-all duration-500 ease-out"
                               style={{ opacity: percentSteps > 0 ? 1 : 0 }} />
                       {/* Вода (Blue) */}
-                      <circle cx="100" cy="100" r="56" fill="none" stroke="#3b82f6" strokeWidth="11"
+                      <circle ref={waterCircleRef} cx="100" cy="100" r="56" fill="none" stroke="#3b82f6" strokeWidth="11"
                               strokeDasharray="352" strokeDashoffset={352 - (352 * percentWater) / 100}
                               strokeLinecap="round" transform="rotate(-90 100 100)" 
-                              className="transition-all duration-500 ease-out"
                               style={{ opacity: percentWater > 0 ? 1 : 0 }} />
                     </svg>
                     <div className="svg-ring-center">
@@ -1045,7 +1085,7 @@ export const NutritionTab: React.FC = React.memo(() => {
                   <div className="kbju-summary-front w-full mt-1">
                     <div className="flex justify-between items-center text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2">
                       <span>СЪЕДЕНО СЕГОДНЯ:</span>
-                      <span className="font-mono text-gray-800 font-black">{eatenCalories} ккал</span>
+                      <span className="font-mono text-gray-800 font-black"><span ref={eatenCalRef}>{eatenCalories}</span> ккал</span>
                     </div>
 
                     <div className="flex justify-between w-full gap-4 border-t border-gym-border/30 pt-3 mt-1.5">
@@ -1147,10 +1187,9 @@ export const NutritionTab: React.FC = React.memo(() => {
                   <span className="flex items-center gap-1 text-blue-500">
                     <Droplet size={12} className="fill-blue-500/18 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300" /> Вода
                   </span>
-                  {/* Вода */}
                 </div>
                 <div>
-                  <div className="text-xl font-black font-display text-blue-600">{eatenWater} мл</div>
+                  <div className="text-xl font-black font-display text-blue-600"><span ref={eatenWaterRef}>{eatenWater}</span> мл</div>
                   <div className="text-[10px] text-gray-400 mt-1 font-semibold">
                     План: {target.water} мл
                     {isWorkoutDay && <span className="text-blue-400 ml-1">(день тренировки)</span>}
@@ -1181,7 +1220,7 @@ export const NutritionTab: React.FC = React.memo(() => {
                   </span>
                 </div>
                 <div>
-                  <div className="text-xl font-black font-display text-emerald-600">{eatenSteps}</div>
+                  <div className="text-xl font-black font-display text-emerald-600"><span ref={eatenStepsRef}>{eatenSteps}</span></div>
                   <div className="text-[10px] text-gray-400 mt-1 font-semibold">План: {target.steps}</div>
                 </div>
                 <div className="flex gap-1.5 mt-2">

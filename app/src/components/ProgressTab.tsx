@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect, useTransition } from 'react';
+import React, { useState, useMemo, useEffect, useTransition, useRef } from 'react';
+import { animateCounter, animateProgressBar } from '../utils/animationEngine';
 import { useGymStore, calcEpley1RM } from '../store/gymStore';
 import type { ProgressEntry, MetricConfig } from '../types';
 import { calculateLBM, generateDietPlans, calculateNavyBodyFat, calculateRelativeStrength, calculatePowerliftingRank, calculate1RMMatrix, calculateEWMATrend } from '../utils/formulas';
@@ -216,6 +217,25 @@ export const ProgressTab: React.FC = React.memo(() => {
 
     return calculatePowerliftingRank(profile.gender || 'male', w, Math.round(total1RM));
   }, [profile.weight, profile.gender, personalRecords, workoutSessions]);
+
+  const dotsRef = useRef<HTMLDivElement>(null);
+  const wilksRef = useRef<HTMLDivElement>(null);
+  const rankProgressRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (dotsRef.current) {
+      animateCounter(dotsRef.current, relativeStrength.dots, 750, 1);
+    }
+    if (wilksRef.current) {
+      animateCounter(wilksRef.current, relativeStrength.wilks, 750, 1);
+    }
+  }, [relativeStrength.dots, relativeStrength.wilks]);
+
+  useEffect(() => {
+    if (rankProgressRef.current) {
+      animateProgressBar(rankProgressRef.current, Math.max(4, rankProgress.progressPercent));
+    }
+  }, [rankProgress.progressPercent]);
 
   // ── Sub-Tab State ─────────────────────────────────────────────────────────
   const [subTab, setSubTab] = useState<'metrics' | 'strength' | 'nutrition' | 'correlation'>('metrics');
@@ -1663,12 +1683,12 @@ export const ProgressTab: React.FC = React.memo(() => {
               <div className="flex items-center gap-4 sm:border-l sm:border-gym-border/40 sm:pl-6 pt-3 sm:pt-0 border-t border-gym-border/20 sm:border-t-0">
                 <div className="text-left sm:text-right">
                   <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">IPF DOTS</div>
-                  <div className="text-xl sm:text-2xl font-black text-gym-accent tabular-nums">{relativeStrength.dots}</div>
+                  <div ref={dotsRef} className="text-xl sm:text-2xl font-black text-gym-accent tabular-nums">{relativeStrength.dots}</div>
                 </div>
                 <div className="h-8 w-px bg-gym-border/40" />
                 <div className="text-left sm:text-right">
                   <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Wilks Score</div>
-                  <div className="text-xl sm:text-2xl font-black text-gray-700 tabular-nums">{relativeStrength.wilks}</div>
+                  <div ref={wilksRef} className="text-xl sm:text-2xl font-black text-gray-700 tabular-nums">{relativeStrength.wilks}</div>
                 </div>
               </div>
             </div>
@@ -1714,7 +1734,8 @@ export const ProgressTab: React.FC = React.memo(() => {
               </div>
               <div className="w-full bg-gray-200/80 rounded-full h-3 p-0.5 shadow-inner overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-gym-accent via-blue-500 to-amber-500 h-full rounded-full transition-all duration-500 shadow-xs"
+                  ref={rankProgressRef}
+                  className="bg-gradient-to-r from-gym-accent via-blue-500 to-amber-500 h-full rounded-full shadow-xs"
                   style={{ width: `${Math.max(4, rankProgress.progressPercent)}%` }}
                 />
               </div>
