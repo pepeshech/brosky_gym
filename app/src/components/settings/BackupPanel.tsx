@@ -1,11 +1,29 @@
 import React, { useRef, useState } from 'react';
 import { exportBackup, importBackupFile } from '../../utils/backupManager';
-import { Download, Upload, FileText } from '../BroskyIcon';
+import { Download, Upload, FileText, Zap } from '../BroskyIcon';
 
 export const BackupPanel: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<{ message: string; type: 'success' | 'error' | '' }>({ message: '', type: '' });
   const [isImporting, setIsImporting] = useState(false);
+
+  const handleForceUpdateApp = async () => {
+    try {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      }
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const registration of registrations) {
+          await registration.unregister();
+        }
+      }
+      window.location.reload();
+    } catch {
+      window.location.reload();
+    }
+  };
 
   const handleExport = () => {
     try {
@@ -46,9 +64,9 @@ export const BackupPanel: React.FC = () => {
           <FileText size={22} className="text-gym-accent" />
         </div>
         <div className="space-y-0.5 min-w-0">
-          <h3 className="text-base sm:text-lg font-bold font-display text-gray-900">Резервное копирование</h3>
+          <h3 className="text-base sm:text-lg font-bold font-display text-gray-900">Резервное копирование и Обновление</h3>
           <p className="text-xs text-gray-500 leading-relaxed">
-            Сохраняйте свои данные локально, чтобы не потерять их при очистке кэша браузера.
+            Сохраняйте бэкап данных локально и принудительно обновляйте PWA-приложение.
           </p>
         </div>
       </div>
@@ -79,6 +97,15 @@ export const BackupPanel: React.FC = () => {
           className="hidden"
           onChange={handleFileChange}
         />
+
+        <button
+          type="button"
+          onClick={handleForceUpdateApp}
+          className="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 border border-gym-border/60 text-gray-700 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 mt-1"
+        >
+          <Zap size={15} className="text-gym-accent" />
+          <span>Принудительно обновить PWA и сбросить кэш</span>
+        </button>
       </div>
 
       {status.message && (

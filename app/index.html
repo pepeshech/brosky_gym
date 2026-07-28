@@ -125,6 +125,13 @@
       </div>
     <script>
       if ('serviceWorker' in navigator) {
+        var refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function() {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
         navigator.serviceWorker.getRegistrations().then(function(regs) {
           for (var r of regs) { r.update(); }
         });
