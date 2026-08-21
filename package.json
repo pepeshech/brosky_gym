@@ -1,6 +1,9 @@
 {
   "name": "brosky-gym-root",
   "private": true,
+  "workspaces": [
+    "app"
+  ],
   "scripts": {
     "prepare": "husky",
     "build": "npm run --prefix app build",
