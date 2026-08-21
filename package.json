@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "prepare": "husky",
+    "build": "npm run --prefix app build",
     "typecheck": "npm run --prefix app typecheck",
     "test": "npm run --prefix app test"
   },
@@ -14,6 +15,6 @@
   },
   "devDependencies": {
     "husky": "^9.1.7",
-    "lint-staged": "^17.2.0"
+    "lint-staged": "^15.4.3"
   }
 }
