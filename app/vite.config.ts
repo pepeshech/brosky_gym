@@ -10,12 +10,12 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       injectRegister: 'auto',
       workbox: {
-        cacheId: 'brosky-gym-v' + Date.now(),
-        skipWaiting: true,
-        clientsClaim: true,
+        cacheId: 'brosky-gym-v1',
+        skipWaiting: false,
+        clientsClaim: false,
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [

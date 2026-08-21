@@ -15,6 +15,12 @@ if %ERRORLEVEL% equ 0 (
     exit /b 0
 )
 
+:: Проверка наличия собранного проекта dist
+if not exist "dist\index.html" (
+    echo [Brosky Gym] Папка dist не найдена. Выполняется начальная сборка проекта...
+    call npm run build
+)
+
 :: Открываем браузер через 1 сек и запускаем сервер Vite Preview
 start /b cmd /c "timeout /t 1 /nobreak >nul & if exist "%BRAVE_EXE%" (start "" "%BRAVE_EXE%" "http://localhost:4173/") else (start "" "http://localhost:4173/")"
 

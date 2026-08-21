@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useTransition, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { animateCounter, animateProgressBar } from '../utils/animationEngine';
 import { useGymStore, calcEpley1RM } from '../store/gymStore';
 import type { ProgressEntry, MetricConfig } from '../types';
@@ -7,14 +8,19 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
   ComposedChart, Line, Bar, Legend
 } from 'recharts';
-import { Plus, Trash2, TrendingDown, TrendingUp, Pencil, Check, X, Settings, ChevronDown, ChevronUp, Layers, Dumbbell, Activity, AlertTriangle, Shield, FileText, Sparkles, Trophy } from './BroskyIcon';
+import { Plus, Trash2, Pencil, Check, X, Settings, ChevronDown, ChevronUp, Layers, Dumbbell, Activity, AlertTriangle, Shield, FileText, Sparkles, Trophy, TrendingUp } from './BroskyIcon';
 import { DatePicker } from './DatePicker';
 import { validateData, ProgressEntrySchema } from '../utils/validation';
 import { ReportsModal } from './ReportsModal';
+import { MetricCard } from './progress/MetricCard';
+import { CustomTooltip } from './progress/CustomTooltip';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
+const SUB_TABS = [
+  { id: 'metrics' as const, name: 'Замеры тела', icon: Layers },
+  { id: 'strength' as const, name: 'Сила и рекорды', icon: Dumbbell },
+  { id: 'nutrition' as const, name: 'Тренды питания', icon: Activity },
+  { id: 'correlation' as const, name: 'Анализ корреляций', icon: TrendingUp },
+];
 
 const PALETTE = [
   '#466bf7', '#ff9500', '#10b981', '#34c759', '#ff2d55',
@@ -34,114 +40,11 @@ const getMetricValue = (entry: ProgressEntry, key: string): number | null => {
   return isNaN(num) ? null : num;
 };
 
-const hex2rgba = (hex: string, alpha: number) => {
-  if (!hex || typeof hex !== 'string') return `rgba(0, 0, 0, ${alpha})`;
-  let cleanHex = hex.replace('#', '');
-  if (cleanHex.length === 3) {
-    cleanHex = cleanHex[0] + cleanHex[0] + cleanHex[1] + cleanHex[1] + cleanHex[2] + cleanHex[2];
-  }
-  const r = parseInt(cleanHex.slice(0, 2), 16) || 0;
-  const g = parseInt(cleanHex.slice(2, 4), 16) || 0;
-  const b = parseInt(cleanHex.slice(4, 6), 16) || 0;
-  return `rgba(${r},${g},${b},${alpha})`;
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Custom Tooltip
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: Array<{ value: number | string }>;
-  label?: string;
-  unit: string;
-  color: string;
-}
-
-const CustomTooltip = ({ active, payload, label, unit, color }: CustomTooltipProps) => {
-  if (active && payload && payload.length) {
-    return (
-      <div
-        className="rounded-2xl px-4 py-3 text-sm shadow-xl border"
-        style={{
-          background: 'rgba(255,255,255,0.92)',
-          backdropFilter: 'blur(16px)',
-          borderColor: `${color}40`,
-          boxShadow: `0 4px 24px ${color}20`,
-        }}
-      >
-        <p className="text-gray-400 text-xs mb-1">{label}</p>
-        <p className="font-bold text-gray-800 text-base">
-          {payload[0].value} <span className="text-xs font-normal text-gray-500">{unit}</span>
-        </p>
-      </div>
-    );
-  }
-  return null;
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Metric Card (bar item)
-// ─────────────────────────────────────────────────────────────────────────────
-
-const MetricCard = ({
-  metric,
-  current,
-  delta,
-  isGood,
-  isSelected,
-  onClick,
-}: {
-  metric: MetricConfig;
-  current: number | null;
-  delta: string | null;
-  isGood: boolean | null;
-  isSelected: boolean;
-  onClick: () => void;
-}) => {
-  const color = metric.color ?? '#466bf7';
-  return (
-    <button
-      onClick={onClick}
-      className="flex flex-col items-start p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-left"
-      style={{
-        background: isSelected
-          ? hex2rgba(color, 0.1)
-          : 'rgba(255,255,255,0.5)',
-        borderColor: isSelected ? `${color}80` : 'rgba(0,0,0,0.07)',
-        boxShadow: isSelected ? `0 0 0 1px ${color}50, 0 4px 16px ${color}20` : 'none',
-        minWidth: 110,
-      }}
-    >
-      <div className="flex items-center gap-1.5 mb-2">
-        <span
-          className="w-2 h-2 rounded-full flex-shrink-0"
-          style={{ background: color }}
-        />
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
-          {metric.name}
-        </span>
-      </div>
-      <span className="text-xl font-bold text-gray-800 tabular-nums leading-none">
-        {current != null ? current : '—'}
-        <span className="text-xs font-normal text-gray-400 ml-1">{metric.unit}</span>
-      </span>
-      {delta != null && isGood != null && (
-        <span
-          className="flex items-center gap-0.5 text-xs font-semibold mt-1.5"
-          style={{ color: isGood ? '#10b981' : '#ef4444' }}
-        >
-          {isGood ? <TrendingDown size={11} /> : <TrendingUp size={11} />}
-          {delta}
-        </span>
-      )}
-    </button>
-  );
-};
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
 // ─────────────────────────────────────────────────────────────────────────────
+
+
 
 export const ProgressTab: React.FC = React.memo(() => {
   const progress = useGymStore(s => s.progress);
@@ -242,8 +145,14 @@ export const ProgressTab: React.FC = React.memo(() => {
   const [renderedSubTab, setRenderedSubTab] = useState<'metrics' | 'strength' | 'nutrition' | 'correlation'>('metrics');
   const [, startTransition] = useTransition();
 
-  const handleSubTabChange = (tab: 'metrics' | 'strength' | 'nutrition' | 'correlation') => {
+  const handleSubTabChange = (
+    tab: 'metrics' | 'strength' | 'nutrition' | 'correlation',
+    e?: React.MouseEvent<HTMLButtonElement>
+  ) => {
     setSubTab(tab);
+    if (e?.currentTarget) {
+      e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
     startTransition(() => {
       setRenderedSubTab(tab);
     });
@@ -758,52 +667,33 @@ export const ProgressTab: React.FC = React.memo(() => {
 
       {/* ── Sub-Tab Selector / Toolbar ────────────────────────────────────────── */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white/40 border border-gym-border/40 p-2 rounded-3xl backdrop-blur-xs">
-        <div className="overflow-x-auto -mx-1 px-1 py-1 md:-my-1 md:py-0 w-full md:w-auto">
-          <div className="flex gap-1.5 p-1 bg-white/60 border border-gym-border/30 rounded-2xl w-fit shadow-xs min-w-max">
-            <button
-              onClick={() => handleSubTabChange('metrics')}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer btn-interactive ${
-                subTab === 'metrics'
-                  ? 'bg-gym-accent text-white shadow-md shadow-gym-accent/25'
-                  : 'text-gray-500 hover:text-gray-800 hover:bg-white/40'
-              }`}
-            >
-              <Layers size={13} fill="currentColor" fillOpacity={0.15} />
-              Замеры тела
-            </button>
-            <button
-              onClick={() => handleSubTabChange('strength')}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer btn-interactive ${
-                subTab === 'strength'
-                  ? 'bg-gym-accent text-white shadow-md shadow-gym-accent/25'
-                  : 'text-gray-500 hover:text-gray-800 hover:bg-white/40'
-              }`}
-            >
-              <Dumbbell size={13} fill="currentColor" fillOpacity={0.15} />
-              Сила и рекорды
-            </button>
-            <button
-              onClick={() => handleSubTabChange('nutrition')}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer btn-interactive ${
-                subTab === 'nutrition'
-                  ? 'bg-gym-accent text-white shadow-md shadow-gym-accent/25'
-                  : 'text-gray-500 hover:text-gray-800 hover:bg-white/40'
-              }`}
-            >
-              <Activity size={13} fill="currentColor" fillOpacity={0.15} />
-              Тренды питания
-            </button>
-            <button
-              onClick={() => handleSubTabChange('correlation')}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer btn-interactive ${
-                subTab === 'correlation'
-                  ? 'bg-gym-accent text-white shadow-md shadow-gym-accent/25'
-                  : 'text-gray-500 hover:text-gray-800 hover:bg-white/40'
-              }`}
-            >
-              <TrendingUp size={13} />
-              Анализ корреляций
-            </button>
+        <div className="relative overflow-x-auto scrollbar-none -mx-1 px-1 py-1 md:-my-1 md:py-0 w-full md:w-auto">
+          <div className="flex gap-1.5 p-1 bg-white/70 border border-gym-border/40 rounded-2xl w-fit shadow-xs min-w-max">
+            {SUB_TABS.map(tab => {
+              const isActive = subTab === tab.id;
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={e => handleSubTabChange(tab.id, e)}
+                  className={`relative z-10 flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer select-none whitespace-nowrap btn-interactive ${
+                    isActive
+                      ? 'text-white'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-white/40'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeProgressSubTabPill"
+                      className="absolute inset-0 bg-gym-accent rounded-xl shadow-md shadow-gym-accent/30 -z-10"
+                      transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                    />
+                  )}
+                  <Icon size={13} className="shrink-0" />
+                  <span>{tab.name}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -1186,8 +1076,17 @@ export const ProgressTab: React.FC = React.memo(() => {
         </div>
       )}
 
-      {/* ── SUB-TAB 1: Metrics (Замеры тела) ─────────────────────────────────── */}
-      {renderedSubTab === 'metrics' && (
+      {/* ── Sub-Tab Content with Smooth Animation ───────────────────────────── */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={renderedSubTab}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+        >
+          {/* ── SUB-TAB 1: Metrics (Замеры тела) ─────────────────────────────────── */}
+          {renderedSubTab === 'metrics' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Левая колонка (Графики, карточки, управление параметрами, журнал) */}
           <div 
@@ -1265,8 +1164,9 @@ export const ProgressTab: React.FC = React.memo(() => {
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-56 flex items-center justify-center text-gray-400 text-sm">
-                  Нужно минимум 2 замера для графика
+                <div className="h-44 sm:h-56 flex flex-col items-center justify-center text-gray-400 text-xs sm:text-sm gap-2 bg-gray-50/50 rounded-2xl border border-dashed border-gym-border/60 p-4">
+                  <Activity size={24} className="text-gray-300" />
+                  <span>Нужно минимум 2 замера для построения графика</span>
                 </div>
               )}
             </div>
@@ -2114,9 +2014,9 @@ export const ProgressTab: React.FC = React.memo(() => {
             </p>
 
             {correlationWeightCaloriesData.length >= 2 ? (
-              <div className="w-full h-64">
+              <div className="w-full h-72">
                 <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                  <ComposedChart data={correlationWeightCaloriesData} margin={{ top: 10, right: -5, left: -20, bottom: 0 }}>
+                  <ComposedChart data={correlationWeightCaloriesData} margin={{ top: 38, right: 10, left: -15, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="0" vertical={false} stroke="rgba(0,0,0,0.05)" />
                     <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                     
@@ -2133,8 +2033,9 @@ export const ProgressTab: React.FC = React.memo(() => {
                     <YAxis 
                       yAxisId="right" 
                       orientation="right" 
-                      domain={['auto', 'auto']} 
+                      domain={[0, (dataMax: number) => (dataMax && dataMax > 0 ? Math.ceil(dataMax * 1.15) : 3000)]} 
                       tick={{ fontSize: 10, fill: '#f43f5e' }} 
+                      tickFormatter={(v: number) => `${Math.round(v)}`}
                       axisLine={false} 
                       tickLine={false} 
                     />
@@ -2164,7 +2065,7 @@ export const ProgressTab: React.FC = React.memo(() => {
                         return null;
                       }}
                     />
-                    <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: 11, fontWeight: 'bold' }} />
+                    <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: 11, fontWeight: 'bold', top: 0 }} />
                     
                     <Bar 
                       yAxisId="right" 
@@ -2173,7 +2074,7 @@ export const ProgressTab: React.FC = React.memo(() => {
                       fill="#f43f5e" 
                       opacity={0.15} 
                       radius={[4, 4, 0, 0]} 
-                      barSize={20}
+                      barSize={16}
                     />
                     <Line 
                       yAxisId="left" 
@@ -2182,7 +2083,7 @@ export const ProgressTab: React.FC = React.memo(() => {
                       name="Вес тела (кг)" 
                       stroke="#a855f7" 
                       strokeWidth={2.5} 
-                      dot={{ r: 3, stroke: '#a855f7', strokeWidth: 1.5, fill: '#fff' }}
+                      dot={{ r: 2, fill: '#a855f7' }}
                       activeDot={{ r: 5 }}
                     />
                   </ComposedChart>
@@ -2250,9 +2151,9 @@ export const ProgressTab: React.FC = React.memo(() => {
                 Сначала выполните силовую тренировку, чтобы появился список упражнений.
               </div>
             ) : correlationStrengthVolumeData.length >= 2 ? (
-              <div className="w-full h-64">
+              <div className="w-full h-72">
                 <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                  <ComposedChart data={correlationStrengthVolumeData} margin={{ top: 10, right: -5, left: -20, bottom: 0 }}>
+                  <ComposedChart data={correlationStrengthVolumeData} margin={{ top: 38, right: 10, left: -15, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="0" vertical={false} stroke="rgba(0,0,0,0.05)" />
                     <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                     
@@ -2269,8 +2170,9 @@ export const ProgressTab: React.FC = React.memo(() => {
                     <YAxis 
                       yAxisId="right" 
                       orientation="right" 
-                      domain={['auto', 'auto']} 
+                      domain={[0, (dataMax: number) => (dataMax && dataMax > 0 ? Math.ceil(dataMax * 1.15) : 1000)]} 
                       tick={{ fontSize: 10, fill: '#f97316' }} 
+                      tickFormatter={(v: number) => `${Math.round(v)}`}
                       axisLine={false} 
                       tickLine={false} 
                     />
@@ -2300,7 +2202,7 @@ export const ProgressTab: React.FC = React.memo(() => {
                         return null;
                       }}
                     />
-                    <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: 11, fontWeight: 'bold' }} />
+                    <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: 11, fontWeight: 'bold', top: 0 }} />
                     
                     <Bar 
                       yAxisId="right" 
@@ -2309,7 +2211,7 @@ export const ProgressTab: React.FC = React.memo(() => {
                       fill="#f97316" 
                       opacity={0.15} 
                       radius={[4, 4, 0, 0]} 
-                      barSize={20}
+                      barSize={16}
                     />
                     <Line 
                       yAxisId="left" 
@@ -2318,7 +2220,7 @@ export const ProgressTab: React.FC = React.memo(() => {
                       name="Расчетный 1RM (кг)" 
                       stroke="#466bf7" 
                       strokeWidth={2.5} 
-                      dot={{ r: 3, stroke: '#466bf7', strokeWidth: 1.5, fill: '#fff' }}
+                      dot={{ r: 2, fill: '#466bf7' }}
                       activeDot={{ r: 5 }}
                     />
                   </ComposedChart>
@@ -2332,6 +2234,8 @@ export const ProgressTab: React.FC = React.memo(() => {
           </div>
         </div>
       )}
+        </motion.div>
+      </AnimatePresence>
     </div>
     </>
   );

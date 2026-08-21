@@ -16,80 +16,8 @@ import type { NutritionPreset, NutritionFoodItem } from '../types';
 const generateStepsId = () => 'steps-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
 const generateWaterId = () => 'water-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
 
-// Встроенный каталог популярных продуктов с КБЖУ на 100г
-const POPULAR_FOODS = [
-  // Источники белка (курица, мясо, рыба, яйца, творог)
-  { name: 'Куриное филе отварное', calories: 170, protein: 30, fat: 3.5, carbs: 0, baseWeight: 100 },
-  { name: 'Индейка филе запеченное', calories: 145, protein: 25, fat: 3, carbs: 0, baseWeight: 100 },
-  { name: 'Говядина постная тушеная', calories: 220, protein: 22, fat: 15, carbs: 0, baseWeight: 100 },
-  { name: 'Свинина вырезка запеченная', calories: 180, protein: 20, fat: 11, carbs: 0, baseWeight: 100 },
-  { name: 'Лосось (семга) на пару', calories: 197, protein: 21, fat: 12.3, carbs: 0, baseWeight: 100 },
-  { name: 'Тунец консервированный в собств. соку', calories: 96, protein: 21.5, fat: 1, carbs: 0, baseWeight: 100 },
-  { name: 'Минтай отварной', calories: 79, protein: 17.2, fat: 0.9, carbs: 0, baseWeight: 100 },
-  { name: 'Креветки вареные', calories: 95, protein: 19, fat: 1.5, carbs: 0, baseWeight: 100 },
-  { name: 'Яйцо куриное вареное (1 шт ~55г)', calories: 155, protein: 12.6, fat: 10.6, carbs: 0.8, baseWeight: 100 },
-  { name: 'Белок яичный вареный', calories: 44, protein: 11.1, fat: 0.2, carbs: 0.7, baseWeight: 100 },
-  { name: 'Творог 5%', calories: 121, protein: 17.2, fat: 5, carbs: 1.8, baseWeight: 100 },
-  { name: 'Творог обезжиренный 0.2%', calories: 78, protein: 16.5, fat: 0.2, carbs: 2, baseWeight: 100 },
-  { name: 'Сыр легкий 15%', calories: 260, protein: 30, fat: 15, carbs: 0, baseWeight: 100 },
-  { name: 'Сыр Пармезан', calories: 392, protein: 35.7, fat: 25.8, carbs: 3.2, baseWeight: 100 },
-  { name: 'Йогурт греческий 2%', calories: 73, protein: 8, fat: 2, carbs: 3.5, baseWeight: 100 },
-  { name: 'Молоко 2.5%', calories: 52, protein: 2.8, fat: 2.5, carbs: 4.7, baseWeight: 100 },
-  { name: 'Кефир 1%', calories: 40, protein: 3, fat: 1, carbs: 4, baseWeight: 100 },
-
-  // Источники углеводов (крупы, макароны, хлеб, картофель)
-  { name: 'Гречневая каша вареная', calories: 110, protein: 4, fat: 1, carbs: 21, baseWeight: 100 },
-  { name: 'Рис белый вареный', calories: 130, protein: 2.7, fat: 0.3, carbs: 28, baseWeight: 100 },
-  { name: 'Рис бурый вареный', calories: 111, protein: 2.6, fat: 0.9, carbs: 23, baseWeight: 100 },
-  { name: 'Макароны твердых сортов вареные', calories: 140, protein: 5, fat: 0.5, carbs: 28, baseWeight: 100 },
-  { name: 'Овсяная каша на воде', calories: 88, protein: 3, fat: 1.7, carbs: 15, baseWeight: 100 },
-  { name: 'Киноа вареная', calories: 120, protein: 4.4, fat: 1.9, carbs: 21.3, baseWeight: 100 },
-  { name: 'Булгур вареный', calories: 83, protein: 3, fat: 0.2, carbs: 18.6, baseWeight: 100 },
-  { name: 'Картофель отварной', calories: 82, protein: 2, fat: 0.4, carbs: 16.7, baseWeight: 100 },
-  { name: 'Хлеб ржаной', calories: 215, protein: 6.5, fat: 1.2, carbs: 42, baseWeight: 100 },
-  { name: 'Хлеб цельнозерновой', calories: 247, protein: 11, fat: 3.5, carbs: 41, baseWeight: 100 },
-  { name: 'Хлеб пшеничный (батон)', calories: 262, protein: 7.5, fat: 2.9, carbs: 50.9, baseWeight: 100 },
-  { name: 'Хлебцы ржаные', calories: 310, protein: 10, fat: 2, carbs: 61, baseWeight: 100 },
-
-  // Жиры и орехи
-  { name: 'Масло оливковое', calories: 884, protein: 0, fat: 99.8, carbs: 0, baseWeight: 100 },
-  { name: 'Масло сливочное 82.5%', calories: 748, protein: 0.5, fat: 82.5, carbs: 0.8, baseWeight: 100 },
-  { name: 'Авокадо', calories: 160, protein: 2, fat: 14.7, carbs: 1.8, baseWeight: 100 },
-  { name: 'Арахисовая паста', calories: 590, protein: 24, fat: 50, carbs: 12, baseWeight: 100 },
-  { name: 'Миндаль орех', calories: 579, protein: 21.2, fat: 49.9, carbs: 21.6, baseWeight: 100 },
-  { name: 'Грецкий орех', calories: 654, protein: 15.2, fat: 65.2, carbs: 13.7, baseWeight: 100 },
-  { name: 'Кешью орех', calories: 553, protein: 18.2, fat: 43.8, carbs: 30.2, baseWeight: 100 },
-
-  // Овощи и зелень (клетчатка)
-  { name: 'Помидоры (томаты)', calories: 18, protein: 0.9, fat: 0.2, carbs: 3.9, baseWeight: 100 },
-  { name: 'Огурцы свежие', calories: 15, protein: 0.8, fat: 0.1, carbs: 2.8, baseWeight: 100 },
-  { name: 'Брокколи отварная', calories: 35, protein: 2.4, fat: 0.4, carbs: 6.6, baseWeight: 100 },
-  { name: 'Цветная капуста отварная', calories: 25, protein: 1.9, fat: 0.3, carbs: 5, baseWeight: 100 },
-  { name: 'Капуста белокочанная свежая', calories: 25, protein: 1.8, fat: 0.1, carbs: 4.7, baseWeight: 100 },
-  { name: 'Болгарский перец красный', calories: 26, protein: 1.3, fat: 0.1, carbs: 5.3, baseWeight: 100 },
-  { name: 'Морковь свежая', calories: 41, protein: 0.9, fat: 0.2, carbs: 9.6, baseWeight: 100 },
-  { name: 'Шпинат свежий', calories: 23, protein: 2.9, fat: 0.4, carbs: 3.6, baseWeight: 100 },
-  { name: 'Салат листовой', calories: 15, protein: 1.2, fat: 0.2, carbs: 2.9, baseWeight: 100 },
-
-  // Фрукты и ягоды
-  { name: 'Банан', calories: 96, protein: 1.5, fat: 0.2, carbs: 22, baseWeight: 100 },
-  { name: 'Яблоко зеленое', calories: 52, protein: 0.3, fat: 0.2, carbs: 12, baseWeight: 100 },
-  { name: 'Груша конфер', calories: 47, protein: 0.4, fat: 0.3, carbs: 10.3, baseWeight: 100 },
-  { name: 'Апельсин', calories: 47, protein: 0.9, fat: 0.2, carbs: 10.3, baseWeight: 100 },
-  { name: 'Грейпфрут', calories: 35, protein: 0.7, fat: 0.2, carbs: 8, baseWeight: 100 },
-  { name: 'Клубника свежая', calories: 32, protein: 0.7, fat: 0.3, carbs: 7.7, baseWeight: 100 },
-  { name: 'Черника свежая', calories: 57, protein: 0.7, fat: 0.3, carbs: 14.5, baseWeight: 100 },
-
-  // Готовые блюда и спортивное питание
-  { name: 'Протеиновый концентрат сывороточный', calories: 400, protein: 80, fat: 5, carbs: 10, baseWeight: 100 },
-  { name: 'Борщ домашний со свининой', calories: 96, protein: 4.5, fat: 6.8, carbs: 4.2, baseWeight: 100 },
-  { name: 'Суп куриный с лапшой', calories: 45, protein: 3.2, fat: 1.8, carbs: 4, baseWeight: 100 },
-  { name: 'Сырники из творога (жареные)', calories: 220, protein: 15, fat: 9, carbs: 19.5, baseWeight: 100 },
-  { name: 'Котлета куриная паровая', calories: 135, protein: 18.5, fat: 5, carbs: 4, baseWeight: 100 },
-  { name: 'Шаурма с курицей (готовая)', calories: 175, protein: 9, fat: 8.5, carbs: 15.5, baseWeight: 100 },
-  { name: 'Салат Цезарь с курицей', calories: 150, protein: 11, fat: 9.5, carbs: 5.2, baseWeight: 100 },
-  { name: 'Салат томаты/огурцы с оливковым маслом', calories: 90, protein: 0.8, fat: 8, carbs: 3.8, baseWeight: 100 },
-];
+import { POPULAR_FOODS } from '../data/foodCatalog';
+import { BarcodeScannerModal } from './nutrition/BarcodeScannerModal';
 
 interface OpenFoodFactsProduct {
   product_name?: string;
@@ -105,136 +33,8 @@ interface OpenFoodFactsProduct {
   image_url?: string;
 }
 
-interface BarcodeScannerModalProps {
-  onClose: () => void;
-  onScanSuccess: (barcode: string) => void;
-}
-
-const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({ onClose, onScanSuccess }) => {
-  const [error, setError] = useState<string | null>(null);
-  const [cameraLoading, setCameraLoading] = useState(true);
-
-  useEffect(() => {
-    let html5QrCode: any = null;
-    let isMounted = true;
-
-    const startCamera = async () => {
-      try {
-        const { Html5Qrcode } = await import('html5-qrcode');
-        if (!isMounted) return;
-        html5QrCode = new Html5Qrcode("barcode-reader");
-        const config = {
-          fps: 10,
-          qrbox: (width: number, height: number) => {
-            const boxWidth = Math.min(width * 0.8, 280);
-            const boxHeight = Math.min(height * 0.4, 140);
-            return { width: boxWidth, height: boxHeight };
-          }
-        };
-
-        await html5QrCode.start(
-          { facingMode: "environment" },
-          config,
-          (decodedText: string) => {
-            if (isMounted) {
-              onScanSuccess(decodedText);
-            }
-          },
-          () => {
-            // ignore scan errors
-          }
-        );
-        if (isMounted) {
-          setCameraLoading(false);
-        }
-      } catch (err: any) {
-        console.error("Camera init failed:", err);
-        if (isMounted) {
-          setError(
-            err?.message ||
-              "Не удалось запустить камеру. Проверьте разрешения в браузере."
-          );
-          setCameraLoading(false);
-        }
-      }
-    };
-
-    const timer = setTimeout(startCamera, 300);
-
-    return () => {
-      isMounted = false;
-      clearTimeout(timer);
-      if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode
-          .stop()
-          .then(() => {
-            html5QrCode.clear();
-          })
-          .catch((e: any) => console.error("Error stopping scanner in cleanup:", e));
-      }
-    };
-  }, [onScanSuccess]);
-
-  return (
-    <div className="glass-panel fixed inset-0 flex flex-col items-center justify-center z-[10000] p-4 bg-black/30 backdrop-blur-sm animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="barcode-modal-title" aria-describedby="barcode-modal-desc">
-      <div className="bg-white/95 border border-gym-border/80 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative flex flex-col items-center gap-4 text-center overflow-hidden backdrop-blur-md">
-        <div>
-          <h3 id="barcode-modal-title" className="font-display font-black text-gray-800 text-lg tracking-tight">
-            Сканирование штрих-кода
-          </h3>
-          <p id="barcode-modal-desc" className="text-xs text-gray-500 font-semibold mt-1">
-            Наведите камеру на штрих-код продукта питания
-          </p>
-        </div>
-
-        <div className="w-full aspect-square max-w-[280px] bg-black rounded-2xl overflow-hidden border border-gym-border/40 relative flex items-center justify-center">
-          {cameraLoading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/95 z-20">
-              <LoaderPulse size={32} className="text-gym-accent animate-spin" />
-              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Подключение камеры...</span>
-            </div>
-          )}
-
-          {error ? (
-            <div className="p-4 text-red-500 text-xs font-semibold leading-relaxed z-20">
-              {error}
-            </div>
-          ) : (
-            <div id="barcode-reader" className="w-full h-full object-cover [&_video]:object-cover" />
-          )}
-
-          {!cameraLoading && !error && (
-            <div className="absolute inset-0 border-[3px] border-gym-accent/30 rounded-2xl pointer-events-none flex items-center justify-center">
-              <div className="w-[85%] h-[2px] bg-red-500 shadow-[0_0_8px_#f43f5e] absolute animate-[scannerLaser_2s_infinite_ease-in-out]" />
-              <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-gym-accent rounded-tl-md" />
-              <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-gym-accent rounded-tr-md" />
-              <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-gym-accent rounded-bl-md" />
-              <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-gym-accent rounded-br-md" />
-            </div>
-          )}
-        </div>
-
-        <div className="w-full mt-2">
-          <button
-            onClick={onClose}
-            className="w-full py-3 rounded-xl font-bold text-sm text-gray-600 bg-gray-100 hover:bg-gray-250 active:scale-[0.96] transition-all cursor-pointer btn-interactive"
-          >
-            Отмена
-          </button>
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes scannerLaser {
-          0%, 100% { transform: translateY(-40px); }
-          50% { transform: translateY(40px); }
-        }
-      `}</style>
-    </div>
-  );
-};
-
 export const NutritionTab: React.FC = React.memo(() => {
+
   const profile = useGymStore(s => s.profile);
   const updateProfile = useGymStore(s => s.updateProfile);
   const nutritionLogs = useGymStore(s => s.nutritionLogs);
@@ -333,6 +133,8 @@ export const NutritionTab: React.FC = React.memo(() => {
 
   // Поиск еды
   const [searchQuery, setSearchQuery] = useState('');
+
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [isSearchingApi, setIsSearchingApi] = useState(false);
   const [apiSearchResults, setApiSearchResults] = useState<Array<typeof POPULAR_FOODS[0]>>([]);
@@ -971,7 +773,7 @@ export const NutritionTab: React.FC = React.memo(() => {
     <div className="space-y-6">
       
       {/* Шапка с датой */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white/40 border border-gym-border/40 rounded-3xl p-4 sm:p-5 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 bg-white/40 border border-gym-border/40 rounded-3xl p-4 sm:p-5 shadow-xs">
         <div>
           <h3 className="text-lg font-black tracking-tight text-gray-800 flex items-center gap-2">
             <Calendar size={18} className="text-gym-accent" />
@@ -979,11 +781,11 @@ export const NutritionTab: React.FC = React.memo(() => {
           </h3>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center bg-white/50 border border-gym-border/60 rounded-xl shadow-xs h-9">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+          <div className="flex items-center bg-white/80 border border-gym-border/60 rounded-xl shadow-xs h-9 justify-between sm:justify-start">
             <button 
               onClick={() => handleShiftDate(-1)} 
-              className="h-9 w-9 flex items-center justify-center hover:bg-gray-150 transition-all cursor-pointer text-gray-500 rounded-l-xl border-r border-gym-border/30 btn-interactive btn-interactive-nav-left"
+              className="h-9 w-9 flex items-center justify-center hover:bg-gray-150 transition-all cursor-pointer text-gray-500 rounded-l-xl border-r border-gym-border/30 btn-interactive btn-interactive-nav-left active:scale-95"
             >
               <ChevronLeft size={14} />
             </button>
@@ -995,35 +797,37 @@ export const NutritionTab: React.FC = React.memo(() => {
             />
             <button 
               onClick={() => handleShiftDate(1)} 
-              className="h-9 w-9 flex items-center justify-center hover:bg-gray-150 transition-all cursor-pointer text-gray-500 rounded-r-xl border-l border-gym-border/30 btn-interactive btn-interactive-nav-right"
+              className="h-9 w-9 flex items-center justify-center hover:bg-gray-150 transition-all cursor-pointer text-gray-500 rounded-r-xl border-l border-gym-border/30 btn-interactive btn-interactive-nav-right active:scale-95"
             >
               <ChevronRight size={14} />
             </button>
           </div>
           
-          <button
-            onClick={() => setIsAdvisorModalOpen(true)}
-            className="bg-gradient-to-r from-gym-accent to-purple-600 hover:opacity-95 text-white shadow-xs text-xs font-bold px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 btn-interactive"
-          >
-            <Sparkles size={14} className="text-yellow-300" />
-            Умный добор БЖУ
-          </button>
-          <button
-            onClick={handleFillToPlan}
-            className="bg-gym-accent/10 hover:bg-gym-accent/20 text-gym-accent border border-gym-accent/20 text-xs font-bold px-3 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 btn-interactive"
-          >
-            <Sparkles size={14} />
-            По плану
-          </button>
-          {currentDayLog && (
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
             <button
-              onClick={handleResetDay}
-              className="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold px-3 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 btn-interactive"
+              onClick={() => setIsAdvisorModalOpen(true)}
+              className="bg-gradient-to-r from-gym-accent to-purple-600 hover:opacity-95 text-white shadow-xs text-xs font-bold px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 btn-interactive"
             >
-              <RefreshCw size={14} />
-              Сбросить
+              <Sparkles size={14} className="text-yellow-300" />
+              <span>Умный добор БЖУ</span>
             </button>
-          )}
+            <button
+              onClick={handleFillToPlan}
+              className="bg-gym-accent/10 hover:bg-gym-accent/20 text-gym-accent border border-gym-accent/20 text-xs font-bold px-3 py-2 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 btn-interactive"
+            >
+              <Sparkles size={14} />
+              <span>По плану</span>
+            </button>
+            {currentDayLog && (
+              <button
+                onClick={handleResetDay}
+                className="col-span-2 sm:col-span-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold px-3 py-2 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 btn-interactive"
+              >
+                <RefreshCw size={14} />
+                <span>Сбросить</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

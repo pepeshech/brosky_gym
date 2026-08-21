@@ -127,7 +127,7 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
             </div>
 
             {/* Content Body */}
-            <div className="p-4 sm:p-6 overflow-y-auto space-y-5">
+            <div className="p-4 sm:p-6 pb-8 overflow-y-auto space-y-5">
               {/* Остаток КБЖУ до цели */}
               <div>
                 <div className="flex items-center justify-between mb-2.5">
@@ -145,7 +145,7 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                   {/* Калории (Rose) */}
                   <div className="p-3 bg-rose-50/70 border border-rose-150/70 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
-                    <span className="text-[10px] font-extrabold text-rose-500 uppercase tracking-wider block mb-0.5">
+                    <span className="text-[10px] font-extrabold text-rose-500 uppercase tracking-wider block mb-0.5 whitespace-nowrap">
                       Калории
                     </span>
                     <span className="text-lg sm:text-xl font-black font-display text-rose-600 leading-tight">
@@ -156,7 +156,7 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
 
                   {/* Белки (Orange) */}
                   <div className="p-3 bg-orange-50/70 border border-orange-150/70 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
-                    <span className="text-[10px] font-extrabold text-orange-500 uppercase tracking-wider block mb-0.5">
+                    <span className="text-[10px] font-extrabold text-orange-500 uppercase tracking-wider block mb-0.5 whitespace-nowrap">
                       Белки
                     </span>
                     <span className="text-lg sm:text-xl font-black font-display text-orange-600 leading-tight">
@@ -167,7 +167,7 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
 
                   {/* Жиры (Yellow/Amber) */}
                   <div className="p-3 bg-yellow-50/70 border border-yellow-150/70 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
-                    <span className="text-[10px] font-extrabold text-yellow-600 uppercase tracking-wider block mb-0.5">
+                    <span className="text-[10px] font-extrabold text-yellow-600 uppercase tracking-wider block mb-0.5 whitespace-nowrap">
                       Жиры
                     </span>
                     <span className="text-lg sm:text-xl font-black font-display text-yellow-600 leading-tight">
@@ -178,7 +178,7 @@ export const SmartMacroAdvisorModal: React.FC<SmartMacroAdvisorModalProps> = ({
 
                   {/* Углеводы (Cyan) */}
                   <div className="p-3 bg-cyan-50/70 border border-cyan-150/70 rounded-2xl flex flex-col items-center justify-center text-center shadow-xs">
-                    <span className="text-[10px] font-extrabold text-cyan-600 uppercase tracking-wider block mb-0.5">
+                    <span className="text-[10px] font-extrabold text-cyan-600 uppercase tracking-wider block mb-0.5 whitespace-nowrap">
                       Углеводы
                     </span>
                     <span className="text-lg sm:text-xl font-black font-display text-cyan-600 leading-tight">

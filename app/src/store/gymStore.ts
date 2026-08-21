@@ -85,6 +85,35 @@ export const useGymStore = create<GymState>()(
     {
       name: 'gym-tracker-store',
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        profile: state.profile,
+        progress: state.progress,
+        trackedMetrics: state.trackedMetrics,
+        workoutSessions: state.workoutSessions,
+        customExercises: state.exercises ? state.exercises.filter((e) => e.isCustom) : [],
+        workoutTemplates: state.workoutTemplates,
+        personalRecords: state.personalRecords,
+        prHistory: state.prHistory,
+        nutritionLogs: state.nutritionLogs,
+        customFoods: state.customFoods,
+        nutritionPresets: state.nutritionPresets,
+        dailyNutritionPresets: state.dailyNutritionPresets,
+      }),
+      merge: (persistedState: unknown, currentState: GymState) => {
+        if (!persistedState || typeof persistedState !== 'object') return currentState;
+        const pState = persistedState as Partial<GymState> & { customExercises?: typeof defaultExercises };
+        const customEx = pState.customExercises || (Array.isArray(pState.exercises) ? pState.exercises.filter((e) => e.isCustom) : []);
+        const mergedExercises = [
+          ...defaultExercises.filter((de) => !customEx.some((ce) => ce.id === de.id)),
+          ...customEx,
+        ];
+        return {
+          ...currentState,
+          ...pState,
+          exercises: mergedExercises,
+        };
+      },
     }
   )
 );
+

@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useGymStore } from '../store/gymStore';
 import { calculateTDEE, generateDietPlans } from '../utils/formulas';
+import { calculateMuscleRecoveryMap } from '../utils/recoveryEngine';
 import { Activity, Flame, Droplet, Dumbbell, Coffee, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Calendar, Footprints } from './BroskyIcon';
 import { AnatomyModel } from './AnatomyModel';
 import { animateCounter } from '../utils/animationEngine';
@@ -20,118 +21,27 @@ export const HomeTab: React.FC = () => {
   const [showMetaDetails, setShowMetaDetails] = useState(false);
   const [atlasMode, setAtlasMode] = useState<'heatmap' | 'fatigue'>('heatmap');
 
+  // Единый научный расчет восстановления и объема нагрузки через recoveryEngine (MEV/MAV/MRV)
+  const recoveryMap = useMemo(() => {
+    return calculateMuscleRecoveryMap(workoutSessions || [], exercises || [], currentDate);
+  }, [workoutSessions, exercises, currentDate]);
+
   const weeklyLoads = useMemo(() => {
     const loads: Record<string, number> = {};
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
-
-    const recentSessions = (workoutSessions || []).filter(session => {
-      const sessionDate = new Date(session.date);
-      return sessionDate >= sevenDaysAgo;
+    Object.entries(recoveryMap).forEach(([muscle, state]) => {
+      loads[muscle] = state.totalSets7Days;
     });
-
-    recentSessions.forEach(session => {
-      if (!session.logs) return;
-      Object.values(session.logs).forEach(log => {
-        const completedSets = (log.sets || []).filter(s => s.isCompleted).length;
-        if (completedSets === 0) return;
-
-        const exercise = exercises.find(e => e.id === log.exerciseId);
-        if (!exercise) return;
-
-        const mainMuscle = exercise.muscleGroup;
-        if (mainMuscle) {
-          loads[mainMuscle] = (loads[mainMuscle] || 0) + completedSets;
-        }
-
-        if (exercise.muscleGroups && Array.isArray(exercise.muscleGroups)) {
-          exercise.muscleGroups.forEach(subMuscle => {
-            if (subMuscle !== mainMuscle) {
-              loads[subMuscle] = (loads[subMuscle] || 0) + (completedSets * 0.5);
-            }
-          });
-        }
-      });
-    });
-
-    Object.keys(loads).forEach(k => {
-      loads[k] = Math.round(loads[k] * 10) / 10;
-    });
-
     return loads;
-  }, [workoutSessions, exercises]);
+  }, [recoveryMap]);
 
   const fatigueLevels = useMemo(() => {
     const fatigue: Record<string, number> = {};
-    const now = new Date();
-    
-    const threeDaysAgo = new Date();
-    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-    threeDaysAgo.setHours(0, 0, 0, 0);
-
-    const recentSessions = (workoutSessions || []).filter(session => {
-      const sessionDate = new Date(session.date);
-      return sessionDate >= threeDaysAgo;
+    Object.entries(recoveryMap).forEach(([muscle, state]) => {
+      fatigue[muscle] = Math.round(100 - state.recoveryPercent);
     });
-
-    const muscleWorkouts: Record<string, Array<{ hoursElapsed: number; sets: number }>> = {};
-
-    recentSessions.forEach(session => {
-      const sessionDate = new Date(session.date);
-      sessionDate.setHours(12, 0, 0, 0);
-      
-      const diffMs = now.getTime() - sessionDate.getTime();
-      const hoursElapsed = Math.max(0, diffMs / (1000 * 60 * 60));
-
-      if (!session.logs) return;
-
-      Object.values(session.logs).forEach(log => {
-        const completedSets = (log.sets || []).filter(s => s.isCompleted).length;
-        if (completedSets === 0) return;
-
-        const exercise = exercises.find(e => e.id === log.exerciseId);
-        if (!exercise) return;
-
-        const mainMuscle = exercise.muscleGroup;
-        if (mainMuscle) {
-          if (!muscleWorkouts[mainMuscle]) muscleWorkouts[mainMuscle] = [];
-          muscleWorkouts[mainMuscle].push({ hoursElapsed, sets: completedSets });
-        }
-
-        if (exercise.muscleGroups && Array.isArray(exercise.muscleGroups)) {
-          exercise.muscleGroups.forEach(subMuscle => {
-            if (subMuscle !== mainMuscle) {
-              if (!muscleWorkouts[subMuscle]) muscleWorkouts[subMuscle] = [];
-              muscleWorkouts[subMuscle].push({ hoursElapsed, sets: completedSets * 0.5 });
-            }
-          });
-        }
-      });
-    });
-
-    Object.entries(muscleWorkouts).forEach(([muscle, workouts]) => {
-      let maxFatigue = 0;
-      workouts.forEach(w => {
-        let recoveryTime = 24;
-        if (w.sets > 3 && w.sets <= 6) {
-          recoveryTime = 48;
-        } else if (w.sets > 6) {
-          recoveryTime = 72;
-        }
-
-        if (w.hoursElapsed < recoveryTime) {
-          const f = (1 - w.hoursElapsed / recoveryTime) * 100;
-          if (f > maxFatigue) {
-            maxFatigue = f;
-          }
-        }
-      });
-      fatigue[muscle] = Math.round(maxFatigue);
-    });
-
     return fatigue;
-  }, [workoutSessions, exercises]);
+  }, [recoveryMap]);
+
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -561,7 +471,7 @@ export const HomeTab: React.FC = () => {
                 >
                   <span className="mt-1">{dayNum}</span>
                   {hasWorkout ? (
-                    <span className="w-1.5 h-1.5 bg-white rounded-full mb-1 shrink-0"></span>
+                    <span className={`w-1.5 h-1.5 rounded-full mb-1 shrink-0 ${isToday ? 'bg-emerald-600' : 'bg-white'}`}></span>
                   ) : (
                     <span className="w-1.5 h-1.5 opacity-0 mb-1"></span>
                   )}

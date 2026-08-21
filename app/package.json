@@ -9,7 +9,7 @@
     "typecheck": "tsc -b .",
     "lint": "eslint .",
     "preview": "vite preview --port 4173 --strictPort",
-    "test": "vitest run --pool=forks",
+    "test": "vitest run",
     "test:watch": "vitest",
     "prepare": "husky"
   },
@@ -27,9 +27,6 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "recharts": "^3.8.1",
-    "y-indexeddb": "^9.0.12",
-    "y-webrtc": "^10.3.0",
-    "yjs": "^13.6.31",
     "zod": "^4.4.3",
     "zustand": "^5.0.14"
   },
@@ -38,7 +35,6 @@
     "@tailwindcss/postcss": "^4.3.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
-    "@types/animejs": "^3.1.13",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

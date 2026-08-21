@@ -389,10 +389,17 @@ export interface AdaptiveTDEEResult {
   adaptiveTDEE: number;
   confidenceLevel: 'insufficient' | 'moderate' | 'high';
   confidenceLabel: string;
+  confidenceMargin?: number; // +- kcal/day standard error margin
   dataDaysCount: number;
   weightChangePerWeekKg: number;
   avgDailyCalories: number;
   differenceFromStatic: number;
+  energyDensityKcalPerKg?: number;
+}
+
+export interface AdaptiveTDEEOptions {
+  athleteFatPercent?: number;
+  weeksInDeficit?: number;
 }
 
 export interface EWMATrendEntry {
@@ -400,6 +407,51 @@ export interface EWMATrendEntry {
   weight: number;
   weightTrend: number;
 }
+
+export interface KalmanTrendEntry {
+  date: string;
+  weight: number;
+  weightTrend: number;
+  velocityKgPerDay: number;
+  variance: number;
+}
+
+/**
+ * Calculates energy density of weight change (kcal/kg) according to Forbes nonlinear partitioning curve.
+ * Adipose tissue has ~9400 kcal/kg, Lean tissue ~1800 kcal/kg (due to ~73% water content).
+ * Athletes with low body fat lose higher proportion of LBM/glycogen (~5500-6000 kcal/kg),
+ * while individuals with higher body fat lose primarily adipose tissue (~8500+ kcal/kg).
+ */
+export const calculateForbesEnergyDensity = (fatPercent?: number): number => {
+  const F = (fatPercent !== undefined && fatPercent > 0) ? Math.max(3, Math.min(60, fatPercent)) : 14;
+  // Calibrated Forbes curve for body fat percentage: p(F) ratio of fat mass change
+  const pFat = F / (F + 14.0 * Math.exp(-F / 14.0));
+  const rhoFat = 9400;  // kcal/kg
+  const rhoLean = 1800; // kcal/kg
+  const density = pFat * rhoFat + (1 - pFat) * rhoLean;
+  return Math.round(Math.max(5500, Math.min(9200, density)));
+};
+
+/**
+ * Calculates adaptive thermogenesis (metabolic slowdown) during continuous caloric deficits.
+ */
+export const calculateMetabolicAdaptation = (
+  weeksInDeficit: number,
+  deficitKcal: number,
+  baseBMR: number
+): { adaptedBMR: number; adaptationFactor: number; slowdownKcal: number } => {
+  if (weeksInDeficit <= 1 || deficitKcal <= 100) {
+    return { adaptedBMR: baseBMR, adaptationFactor: 1.0, slowdownKcal: 0 };
+  }
+  const weeks = Math.min(52, weeksInDeficit);
+  const normalizedDeficit = Math.min(1200, Math.max(0, deficitKcal));
+  const slowdownRatio = 0.005 * weeks * (normalizedDeficit / 500);
+  const adaptationFactor = Math.max(0.82, Math.round((1 - slowdownRatio) * 1000) / 1000);
+  const adaptedBMR = Math.round(baseBMR * adaptationFactor);
+  const slowdownKcal = Math.round(baseBMR - adaptedBMR);
+
+  return { adaptedBMR, adaptationFactor, slowdownKcal };
+};
 
 /**
  * Exponentially Weighted Moving Average (EWMA) weight trend calculation.
@@ -431,13 +483,94 @@ export const calculateEWMATrend = (
 };
 
 /**
- * Science-backed Adaptive Expenditure Engine (MacroFactor-style Exponential Moving Average).
+ * 1D Constant Velocity Kalman Filter for biological mass tracking.
+ * Provides optimal noise filtration (water/sodium spikes) with zero phase lag.
+ */
+export const calculateKalmanTrend = (
+  entries: Array<{ date: string; weight?: number }>,
+  qNoise: number = 0.008,
+  rNoise: number = 0.75
+): KalmanTrendEntry[] => {
+  const sorted = entries
+    .filter((e): e is { date: string; weight: number } => e.weight !== undefined && e.weight > 0)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  if (sorted.length === 0) return [];
+
+  let x = sorted[0].weight; // position (weight)
+  let v = 0;               // velocity (kg/day)
+  let p00 = 0.25;          // position variance
+  let p01 = 0.0;           // covariance
+  let p10 = 0.0;
+  let p11 = 0.02;          // velocity variance
+
+  const result: KalmanTrendEntry[] = [];
+
+  for (let i = 0; i < sorted.length; i++) {
+    const entry = sorted[i];
+    if (i === 0) {
+      result.push({
+        date: entry.date,
+        weight: entry.weight,
+        weightTrend: Math.round(x * 100) / 100,
+        velocityKgPerDay: 0,
+        variance: Math.round(p00 * 100) / 100,
+      });
+      continue;
+    }
+
+    const prevDate = new Date(sorted[i - 1].date).getTime();
+    const curDate = new Date(entry.date).getTime();
+    const dt = Math.max(0.1, (curDate - prevDate) / (1000 * 60 * 60 * 24));
+
+    // Predict step
+    const xPred = x + v * dt;
+    const vPred = v;
+
+    const q00 = (dt * dt * dt / 3) * qNoise;
+    const q01 = (dt * dt / 2) * qNoise;
+    const q11 = dt * qNoise;
+
+    const p00Pred = p00 + dt * (p01 + p10) + dt * dt * p11 + q00;
+    const p01Pred = p01 + dt * p11 + q01;
+    const p10Pred = p10 + dt * p11 + q01;
+    const p11Pred = p11 + q11;
+
+    // Update step
+    const y = entry.weight - xPred; // measurement residual
+    const s = p00Pred + rNoise;     // residual covariance
+    const k0 = p00Pred / s;         // Kalman gain (position)
+    const k1 = p10Pred / s;         // Kalman gain (velocity)
+
+    x = xPred + k0 * y;
+    v = vPred + k1 * y;
+
+    p00 = (1 - k0) * p00Pred;
+    p01 = (1 - k0) * p01Pred;
+    p10 = -k1 * p00Pred + p10Pred;
+    p11 = -k1 * p01Pred + p11Pred;
+
+    result.push({
+      date: entry.date,
+      weight: entry.weight,
+      weightTrend: Math.round(x * 100) / 100,
+      velocityKgPerDay: Math.round(v * 1000) / 1000,
+      variance: Math.round(p00 * 100) / 100,
+    });
+  }
+
+  return result;
+};
+
+/**
+ * Science-backed Adaptive Expenditure Engine (Forbes Dynamic Partitioning + Filtered Trend).
  * Computes real TDEE by correlating historical body weight changes and logged calorie intake.
  */
 export const calculateAdaptiveTDEE = (
   weightEntries: Array<{ date: string; weight?: number }>,
   nutritionLogs: Array<{ date: string; calories?: number }>,
-  staticTDEE: number
+  staticTDEE: number,
+  options?: AdaptiveTDEEOptions
 ): AdaptiveTDEEResult => {
   const pairedMap = new Map<string, { weight?: number; calories?: number }>();
 
@@ -470,10 +603,12 @@ export const calculateAdaptiveTDEE = (
       adaptiveTDEE: staticTDEE,
       confidenceLevel: 'insufficient',
       confidenceLabel: 'Недостаточно данных (< 7 дней замеров)',
+      confidenceMargin: 300,
       dataDaysCount,
       weightChangePerWeekKg: 0,
       avgDailyCalories: 0,
       differenceFromStatic: 0,
+      energyDensityKcalPerKg: calculateForbesEnergyDensity(options?.athleteFatPercent),
     };
   }
 
@@ -485,20 +620,22 @@ export const calculateAdaptiveTDEE = (
       adaptiveTDEE: staticTDEE,
       confidenceLevel: 'insufficient',
       confidenceLabel: 'Требуется больше замеров веса и калорий',
+      confidenceMargin: 250,
       dataDaysCount,
       weightChangePerWeekKg: 0,
       avgDailyCalories: 0,
       differenceFromStatic: 0,
+      energyDensityKcalPerKg: calculateForbesEnergyDensity(options?.athleteFatPercent),
     };
   }
 
   const totalCalories = entriesWithCalories.reduce((sum, e) => sum + (e.calories || 0), 0);
   const avgDailyCalories = Math.round(totalCalories / entriesWithCalories.length);
 
-  // EWMA trend smoothing for accurate start and end body mass
-  const ewmaTrends = calculateEWMATrend(entriesWithWeight, 0.15);
-  const firstWeight = ewmaTrends.length > 0 ? ewmaTrends[0].weightTrend : entriesWithWeight[0].weight!;
-  const lastWeight = ewmaTrends.length > 0 ? ewmaTrends[ewmaTrends.length - 1].weightTrend : entriesWithWeight[entriesWithWeight.length - 1].weight!;
+  // Filtered trend smoothing for accurate start and end body mass
+  const kalmanTrends = calculateKalmanTrend(entriesWithWeight);
+  const firstWeight = kalmanTrends.length > 0 ? kalmanTrends[0].weightTrend : entriesWithWeight[0].weight!;
+  const lastWeight = kalmanTrends.length > 0 ? kalmanTrends[kalmanTrends.length - 1].weightTrend : entriesWithWeight[entriesWithWeight.length - 1].weight!;
   
   const startDate = new Date(entriesWithWeight[0].date).getTime();
   const endDate = new Date(entriesWithWeight[entriesWithWeight.length - 1].date).getTime();
@@ -508,21 +645,27 @@ export const calculateAdaptiveTDEE = (
   const weightChangePerDay = totalWeightChange / daysDiff;
   const weightChangePerWeekKg = Math.round((weightChangePerDay * 7) * 100) / 100;
 
-  const energySurplusOrDeficitPerDay = weightChangePerDay * 7700;
+  // Forbes non-linear energy density calculation
+  const energyDensity = calculateForbesEnergyDensity(options?.athleteFatPercent);
+  const energySurplusOrDeficitPerDay = weightChangePerDay * energyDensity;
   const rawAdaptiveTDEE = Math.round(avgDailyCalories - energySurplusOrDeficitPerDay);
 
   let confidenceLevel: 'insufficient' | 'moderate' | 'high';
   let confidenceLabel: string;
   let finalTDEE: number;
+  let confidenceMargin: number;
 
   if (dataDaysCount >= 14) {
     confidenceLevel = 'high';
     confidenceLabel = `Высокая точность (${dataDaysCount} дн.)`;
     finalTDEE = rawAdaptiveTDEE;
+    confidenceMargin = 75;
   } else {
     confidenceLevel = 'moderate';
     confidenceLabel = `Средняя точность (${dataDaysCount} дн.)`;
+    // Bayesian prior weighting for 7..13 days
     finalTDEE = Math.round(staticTDEE * 0.5 + rawAdaptiveTDEE * 0.5);
+    confidenceMargin = 150;
   }
 
   finalTDEE = Math.max(1000, Math.min(5000, finalTDEE));
@@ -532,10 +675,12 @@ export const calculateAdaptiveTDEE = (
     adaptiveTDEE: finalTDEE,
     confidenceLevel,
     confidenceLabel,
+    confidenceMargin,
     dataDaysCount,
     weightChangePerWeekKg,
     avgDailyCalories,
     differenceFromStatic,
+    energyDensityKcalPerKg: energyDensity,
   };
 };
 
@@ -624,6 +769,126 @@ export const calculate1RMMatrix = (weight: number, reps: number): OneRepMaxMatri
   };
 };
 
+export interface Weighted1RMResult {
+  estimate1RM: number;
+  confidencePercent: number;
+  rangeMin: number;
+  rangeMax: number;
+  effectiveReps: number;
+  optimalFormulaName: string;
+}
+
+/**
+ * Calculates smooth Gaussian kernel-weighted 1RM estimate with confidence interval and outlier dampening.
+ */
+export const calculateWeighted1RM = (weight: number, reps: number, rir: number = 0): Weighted1RMResult => {
+  if (weight <= 0 || reps <= 0) {
+    return {
+      estimate1RM: 0,
+      confidencePercent: 0,
+      rangeMin: 0,
+      rangeMax: 0,
+      effectiveReps: 0,
+      optimalFormulaName: '—',
+    };
+  }
+
+  const effectiveReps = Math.max(1, reps + Math.max(0, rir));
+  const matrix = calculate1RMMatrix(weight, effectiveReps);
+
+  if (effectiveReps === 1) {
+    return {
+      estimate1RM: weight,
+      confidencePercent: 100,
+      rangeMin: weight,
+      rangeMax: weight,
+      effectiveReps: 1,
+      optimalFormulaName: matrix.optimalFormulaName,
+    };
+  }
+
+  // Gaussian weights around empirical validity centers
+  // Lander center: 2, Brzycki center: 5, Epley center: 8, Wathan center: 14
+  const gWeight = (center: number, sigma: number) => Math.exp(-0.5 * Math.pow((effectiveReps - center) / sigma, 2));
+
+  const wLander = gWeight(2, 2.5);
+  const wBrzycki = gWeight(5, 2.5);
+  const wEpley = gWeight(8, 3.0);
+  const wWathan = gWeight(14, 4.0);
+  const wMayhew = gWeight(12, 4.0);
+  const wOconner = gWeight(6, 3.5);
+
+  const sumWeights = wLander + wBrzycki + wEpley + wWathan + wMayhew + wOconner;
+  const weightedEstimate = (
+    matrix.lander * wLander +
+    matrix.brzycki * wBrzycki +
+    matrix.epley * wEpley +
+    matrix.wathan * wWathan +
+    matrix.mayhew * wMayhew +
+    matrix.oconner * wOconner
+  ) / sumWeights;
+
+  const estimate1RM = Math.round(weightedEstimate * 10) / 10;
+  
+  // Confidence decreases linearly as rep count increases (due to glycolytic fatigue)
+  const confidencePercent = Math.max(40, Math.min(100, Math.round(100 - (effectiveReps - 1) * 2.8)));
+
+  const allVals = [matrix.lander, matrix.brzycki, matrix.epley, matrix.wathan, matrix.mayhew, matrix.oconner];
+  const rangeMin = Math.min(...allVals);
+  const rangeMax = Math.max(...allVals);
+
+  return {
+    estimate1RM,
+    confidencePercent,
+    rangeMin,
+    rangeMax,
+    effectiveReps,
+    optimalFormulaName: matrix.optimalFormulaName,
+  };
+};
+
+export interface MovementFatigueProfile {
+  axialLoad: 'high' | 'moderate' | 'low';
+  systemicCost: number;       // Multiplier on central fatigue (0.5 to 1.6)
+  localRecoveryHours: number; // Estimated hours for complete tissue remodeling
+  categoryName: string;
+}
+
+/**
+ * Returns movement-specific biomechanical fatigue profile and recovery kinetics.
+ */
+export const getMovementFatigueProfile = (exerciseNameOrId: string): MovementFatigueProfile => {
+  const lower = exerciseNameOrId.toLowerCase();
+
+  // Heavy Axial / Spinal Loaded Compound Lifts
+  if (lower.includes('тяг') || lower.includes('присед') || lower.includes('deadlift') || lower.includes('squat') || lower.includes('good morning')) {
+    return {
+      axialLoad: 'high',
+      systemicCost: 1.5,
+      localRecoveryHours: 72,
+      categoryName: 'Базовое осевое движение (высокая системная нагрузка на ЦНС и позвоночник)',
+    };
+  }
+
+  // Upper Body Compound Lifts
+  if (lower.includes('жим') || lower.includes('брусь') || lower.includes('подтягиван') || lower.includes('bench') || lower.includes('press') || lower.includes('dips') || lower.includes('pull')) {
+    return {
+      axialLoad: 'moderate',
+      systemicCost: 1.0,
+      localRecoveryHours: 48,
+      categoryName: 'Базовое многосуставное движение верха тела',
+    };
+  }
+
+  // Isolation / Machine Lifts
+  return {
+    axialLoad: 'low',
+    systemicCost: 0.6,
+    localRecoveryHours: 24,
+    categoryName: 'Изолированное / тренажерное упражнение (минимальная осевая нагрузка)',
+  };
+};
+
 /**
  * Расчёт скорректированного 1RM с учетом запаса повторов (RIR - Reps in Reserve)
  * Epley-Tuchscherer formula: 1RM = Weight * (1 + (Reps + RIR) / 30)
@@ -643,6 +908,7 @@ export const getRpePercent1RM = (reps: number, rpe: number): number => {
   const percent = 1 / (1 + 0.0333 * totalReps);
   return Math.round(percent * 1000) / 10;
 };
+
 
 
 

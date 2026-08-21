@@ -5,7 +5,8 @@ import { useGymStore, calcEpley1RM, MUSCLE_GROUPS, MUSCLE_COLORS, EQUIPMENT_TYPE
 import type {
   WorkoutTemplate, WorkoutTemplateExercise, ExerciseLog, SetLog, Exercise, PersonalRecord, WorkoutSession, } from '../types';
 import {
-  Plus, Trash2, CheckCircle, ChevronDown, ChevronUp, Pencil, Check, X, Dumbbell, ClipboardList, Library, Trophy, ArrowRight, History, ChevronLeft, ChevronRight, Clock, Search, Layers, Muscle, Sparkles } from './BroskyIcon';
+  Plus, Trash2, CheckCircle, ChevronDown, ChevronUp, Pencil, Check, X, Dumbbell, ClipboardList, Trophy, ArrowRight, History, ChevronLeft, ChevronRight, Clock, Search, Layers, Muscle, Sparkles } from './BroskyIcon';
+
 import { DatePicker } from './DatePicker';
 import { useDialog } from './DialogProvider';
 import { validateData, ExerciseSchema, WorkoutTemplateSchema } from '../utils/validation';
@@ -13,6 +14,7 @@ import { AnatomyModel } from './AnatomyModel';
 import { SmartWorkoutGeneratorModal } from './workout/SmartWorkoutGeneratorModal';
 import { calculateAdjusted1RM } from '../utils/formulas';
 import { calculateAutoPilotRecommendation } from '../utils/autoPilotEngine';
+import { WorkoutTabBar, type WorkoutSubTab } from './workout/WorkoutTabBar';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -85,40 +87,10 @@ const hex2rgba = (hex: string, alpha: number) => {
 // Sub-components
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ── Tab Bar ────────────────────────────────────────────────────────────────
-const TabBar = ({
-  active, onChange,
-}: {
-  active: 'session' | 'history' | 'programs' | 'exercises';
-  onChange: (t: 'session' | 'history' | 'programs' | 'exercises') => void;
-}) => {
-  const tabs: { key: 'session' | 'history' | 'programs' | 'exercises'; label: string; icon: React.ReactNode }[] = [
-    { key: 'session',   label: 'Тренировка',  icon: <Dumbbell size={15} fill="currentColor" fillOpacity={0.15} /> },
-    { key: 'history',   label: 'История',     icon: <History size={15} fill="currentColor" fillOpacity={0.12} /> },
-    { key: 'programs',  label: 'Программы',   icon: <ClipboardList size={15} fill="currentColor" fillOpacity={0.12} /> },
-    { key: 'exercises', label: 'Упражнения',  icon: <Library size={15} fill="currentColor" fillOpacity={0.12} /> },
-  ];
-  return (
-    <div className="flex gap-0.5 sm:gap-1 p-1 rounded-2xl bg-white/50 border border-gym-border shadow-sm">
-      {tabs.map(({ key, label, icon }) => (
-        <button
-          key={key}
-          onClick={() => onChange(key)}
-          className="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer btn-interactive"
-          style={active === key
-            ? { background: '#466bf7', color: '#fff', boxShadow: '0 2px 8px rgba(70,107,247,0.3)' }
-            : { color: '#6b7280' }}
-        >
-          {icon} <span className="hidden min-[400px]:inline">{label}</span>
-        </button>
-      ))}
-    </div>
-  );
-};
-
 // ─────────────────────────────────────────────────────────────────────────────
 // SESSION TAB
 // ─────────────────────────────────────────────────────────────────────────────
+
 
 interface SessionTabProps {
   onTabChange?: (tab: 'session' | 'history' | 'programs' | 'exercises') => void;
@@ -2105,11 +2077,11 @@ const HistoryTab: React.FC = () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const WorkoutTab: React.FC = React.memo(() => {
-  const [activeTab, setActiveTab] = useState<'session' | 'history' | 'programs' | 'exercises'>('session');
+  const [activeTab, setActiveTab] = useState<WorkoutSubTab>('session');
 
   return (
     <div className="space-y-5">
-      <TabBar active={activeTab} onChange={setActiveTab} />
+      <WorkoutTabBar active={activeTab} onChange={setActiveTab} />
       {activeTab === 'session'   && <SessionTab onTabChange={setActiveTab} />}
       {activeTab === 'history'   && <HistoryTab />}
       {activeTab === 'programs'  && <ProgramsTab />}
@@ -2117,3 +2089,4 @@ export const WorkoutTab: React.FC = React.memo(() => {
     </div>
   );
 });
+
