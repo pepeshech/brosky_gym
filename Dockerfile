@@ -1,16 +1,17 @@
 # Step 1: Build the React application
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 
-WORKDIR /app
+WORKDIR /workspace
 
-# Copy dependency files
-COPY app/package*.json ./
+# Copy dependency files for npm workspaces
+COPY package*.json ./
+COPY app/package*.json ./app/
 
 # Install dependencies (use npm ci for reproducible builds)
 RUN npm ci
 
 # Copy application source code
-COPY app/ ./
+COPY . .
 
 # Build the application
 RUN npm run build
@@ -19,7 +20,7 @@ RUN npm run build
 FROM nginx:stable-alpine
 
 # Copy built static assets from the build stage
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /workspace/dist /usr/share/nginx/html
 
 # Copy custom Nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
