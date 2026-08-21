@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "prepare": "husky",
-    "build": "npm run --prefix app build",
+    "build": "npm run --prefix app build && node -e \"const fs=require('fs'); if(!fs.existsSync('dist')&&fs.existsSync('app/dist')) fs.cpSync('app/dist','dist',{recursive:true});\"",
     "typecheck": "npm run --prefix app typecheck",
     "test": "npm run --prefix app test"
   },
